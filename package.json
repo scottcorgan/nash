@@ -22,5 +22,13 @@
   "bugs": {
     "url": "https://github.com/scottcorgan/nash/issues"
   },
-  "homepage": "https://github.com/scottcorgan/nash"
+  "homepage": "https://github.com/scottcorgan/nash",
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "minimist": "0.0.7",
+    "feedback": "~0.3.2",
+    "pretty-print": "~0.3.0",
+    "args-list": "~0.3.1",
+    "drainer": "~0.2.1"
+  }
 }
