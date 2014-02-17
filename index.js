@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var Cli = require('./lib/cli');
 var parse = require('./lib/parse');
 var minimist = require('minimist');
 var feedback = require('feedback');
@@ -7,7 +6,7 @@ var print = require('pretty-print');
 var errors = require('./lib/errors');
 var Command = require('./lib/command');
 var Flag = require('./lib/flag');
-var shortcuts = require('./lib/shortcuts');
+var shortcut = require('./lib/shortcut');
 var help = require('./lib/help');
 
 var Nash = function (options) {
@@ -31,6 +30,7 @@ var Nash = function (options) {
   // help(this);
 };
 
+// Run the input as a cli command
 Nash.prototype.run = function (argv) {
   var input = parse.input(minimist(argv.slice(2)));
   
@@ -66,20 +66,39 @@ Nash.prototype.run = function (argv) {
   }
 };
 
+// Command creator
 Nash.prototype.command = function () {
-  var aliases = _.toArray(arguments);
+  var cli = this;
+  var commandAliases = _.toArray(arguments);
   var command = new Command({
-    aliases: aliases
+    aliases: commandAliases
   });
   
   // Track commands for help output
-  this._commandsWithCombinedAlias[aliases.join(', ')] = command;
+  this._commandsWithCombinedAlias[commandAliases.join(', ')] = command;
   
   // Track our commands
-  aliases.forEach(function (alias) {
+  _.each(commandAliases, function (alias) {
     this._commands[alias] = command; // add to command collection
-    this.commands[alias] = shortcuts.add(this, alias, command); // create shortcut
+    this.commands[alias] = shortcut(this, command); // create shortcut
   }, this);
+  
+  // Override task creation function so that
+  // the task shortcut can be made
+  var originalTaskFn = command.task;  //
+  command.task = function () {
+    var taskAliases = _.toArray(arguments);
+    var task = originalTaskFn.apply(command, taskAliases);
+    
+    // Create shorcut for tasks
+    _.each(commandAliases, function (commandAlias) {
+      _.each(taskAliases, function (taskAlias) {
+        cli.commands[commandAlias][taskAlias] = shortcut(cli, task);
+      });
+    });
+    
+    return task;
+  };
   
   return command;
 };
