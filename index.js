@@ -11,8 +11,6 @@ var shortcuts = require('./lib/shortcuts');
 var help = require('./lib/help');
 
 var Nash = function (options) {
-  var nash = this;
-  
   this._commands = {};
   this._commandsWithCombinedAlias = {};
   this._flagsWithCombinedAlias = {};
@@ -23,6 +21,7 @@ var Nash = function (options) {
   this.args = options.args;
   this.errors = errors;
   this.callback = options.callback || function () {};
+  this.commands = {};
   this._beforeCommands = {};
   
   // overrides
@@ -30,45 +29,41 @@ var Nash = function (options) {
   
   // set up default help function
   // help(this);
+};
+
+Nash.prototype.run = function (argv) {
+  var input = parse.input(minimist(argv.slice(2)));
   
-  process.nextTick(function () {
-    input = parse.input(minimist(options.argv.slice(2)));
+  var command = this.getCommand(input.command);
+  
+  if (!command) return feedback.error('Invalid command');
+  
+  // exectute task
+  if (input.task) {
     
-    var command = nash.getCommand(input.command);
+    // TODO: handle beforeCommands with tasks to
     
-    if (!command) return feedback.error('Invalid command');
+    if (!command.isTask(input.task)) return feedback.error('Invalid command');
+    command.executeTask(input.task, input.args, function (err) {
+      if (err) return cli.error(err);
+      // callback.apply(null, _.toArray(arguments));
+    });
     
-    // exectute task
-    if (input.task) {
+   return
+  }
+  else {
+    // Handle before functions
+    // var drain = drainer(_.map(command._before, cli.beforeCommand, cli));
+    
+    // drain(nash, command, function (err) {
+      // if (err) return cli.error(err);
       
-      // TODO: handle beforeCommands with tasks to
-      
-      if (!command.isTask(input.task)) return feedback.error('Invalid command');
-      command.executeTask(input.task, input.args, function (err) {
-        if (err) return cli.error(err);
+      command.execute(input.args, function (err) {
+        if (err) cli.error(err);
         // callback.apply(null, _.toArray(arguments));
-        
       });
-      
-     return
-    }
-    else {
-      // Handle before functions
-      // var drain = drainer(_.map(command._before, cli.beforeCommand, cli));
-      
-      // drain(nash, command, function (err) {
-        // if (err) return cli.error(err);
-        
-        command.execute(input.args, function (err) {
-          if (err) cli.error(err);
-          // callback.apply(null, _.toArray(arguments));
-        });
-      // });
-    }
-    
-    // cli.generateShortcuts();
-    
-  });
+    // });
+  }
 };
 
 Nash.prototype.command = function () {
@@ -82,7 +77,8 @@ Nash.prototype.command = function () {
   
   // Track our commands
   aliases.forEach(function (alias) {
-    this._commands[alias] = command;
+    this._commands[alias] = command; // add to command collection
+    this.commands[alias] = shortcuts.add(this, alias, command); // create shortcut
   }, this);
   
   return command;
@@ -114,11 +110,6 @@ Nash.prototype.error = function (msg) {
 Nash.prototype.beforeCommand = function (name, fn) {
   if (!fn) return this._beforeCommands[name];
   else this._beforeCommands[name] = fn;
-};
-
-Nash.prototype.generateShortcuts = function () {
-  this.commands = shortcuts(this);
-  return this.commands;
 };
 
 Nash.prototype._shouldDebug = function (options) {
