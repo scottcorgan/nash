@@ -8,6 +8,7 @@ var Command = require('./lib/command');
 var Flag = require('./lib/flag');
 var shortcut = require('./lib/shortcut');
 var help = require('./lib/help');
+var drainer = require('drainer');
 
 var Nash = function (options) {
   this._commands = {};
@@ -15,6 +16,7 @@ var Nash = function (options) {
   this._flagsWithCombinedAlias = {};
   this._flags = {};
   this._before = [];
+  this._beforeMethods = [];
   
   this.debug = (options.debug === undefined) ? true : options.debug;
   this.args = options.args;
@@ -46,23 +48,12 @@ Nash.prototype.run = function (argv) {
     if (!command.isTask(input.task)) return feedback.error('Invalid command');
     command.executeTask(input.task, input.args, function (err) {
       if (err) return cli.error(err);
-      // callback.apply(null, _.toArray(arguments));
     });
-    
-   return
   }
   else {
-    // Handle before functions
-    // var drain = drainer(_.map(command._before, cli.beforeCommand, cli));
-    
-    // drain(nash, command, function (err) {
-      // if (err) return cli.error(err);
-      
-      command.execute(input.args, function (err) {
-        if (err) cli.error(err);
-        // callback.apply(null, _.toArray(arguments));
-      });
-    // });
+    command.execute(input.args, function (err) {
+      if (err) cli.error(err);
+    });
   }
 };
 
