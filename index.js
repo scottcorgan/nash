@@ -17,13 +17,13 @@ var Nash = function (options) {
   this._flags = {};
   this._before = [];
   this._beforeMethods = [];
+  this._helpers = {};
   
   this.debug = (options.debug === undefined) ? true : options.debug;
   this.args = options.args;
   this.errors = errors;
   this.callback = options.callback || function () {};
   this.commands = {};
-  this._beforeCommands = {};
   
   // overrides
   _.extend(this, options);
@@ -80,7 +80,8 @@ Nash.prototype.command = function () {
   var cli = this;
   var commandAliases = _.toArray(arguments);
   var command = new Command({
-    aliases: commandAliases
+    aliases: commandAliases,
+    cli: this
   });
   
   // Track commands for help output
@@ -135,11 +136,6 @@ Nash.prototype.error = function (msg) {
   }
 };
 
-Nash.prototype.beforeCommand = function (name, fn) {
-  if (!fn) return this._beforeCommands[name];
-  else this._beforeCommands[name] = fn;
-};
-
 Nash.prototype._shouldDebug = function (options) {
   return (this.debug || (options && options.debug))
 };
@@ -164,6 +160,10 @@ Nash.prototype.executeFlag = function (flag) {
   if (!this._flags[flag]) return;
   this._flags[flag].fn(this);
   return this._flags[flag].options;
+};
+
+Nash.prototype.helper = function (name, fn) {
+  this._helpers[name] = fn;
 };
 
 Nash.createCli = function (options) {
