@@ -16,7 +16,7 @@ var Nash = function (options) {
   this._flags = {};
   this._before = [];
   
-  this.debug = options.debug;
+  this.debug = (options.debug === undefined) ? true : options.debug;
   this.args = options.args;
   this.errors = errors;
   this.callback = options.callback || function () {};
@@ -27,16 +27,16 @@ var Nash = function (options) {
   _.extend(this, options);
   
   // set up default help function
-  // help(this);
+  help(this);
 };
 
 // Run the input as a cli command
 Nash.prototype.run = function (argv) {
   var input = parse.input(minimist(argv.slice(2)));
-  
   var command = this.getCommand(input.command);
   
-  if (!command) return feedback.error('Invalid command');
+  if (this._runFlags(input)) return; // Execute flags
+  if (!command) return feedback.error('Invalid command'); // No command found or invalid command
   
   // exectute task
   if (input.task) {
@@ -63,6 +63,24 @@ Nash.prototype.run = function (argv) {
         // callback.apply(null, _.toArray(arguments));
       });
     // });
+  }
+};
+
+Nash.prototype._runFlags = function (input) {
+  try{
+    var exit = false;
+    var flags = Object.keys(input.args);
+    
+    _.each(flags, function (flagName) {
+      var flag = this._flags[flagName];
+      if (flag) {
+        flag.execute(input.args[flagName]);
+        if (flag._exit) exit = true;
+      }
+    }, this);
+  }
+  finally {
+    return exit;
   }
 };
 
@@ -135,27 +153,27 @@ Nash.prototype._shouldDebug = function (options) {
   return (this.debug || (options && options.debug))
 };
 
-// Nash.prototype.flag = function () {
-//   var aliases = _.rest(_.keys(minimist(_.toArray(arguments))));
-//   var flag = new Flag({
-//     aliases: aliases
-//   });
+Nash.prototype.flag = function () {
+  var aliases = _.rest(_.keys(minimist(_.toArray(arguments))));
+  var flag = new Flag({
+    aliases: aliases
+  });
   
-//   this._flagsWithCombinedAlias[_.toArray(arguments).join(', ')] = flag;
+  this._flagsWithCombinedAlias[_.toArray(arguments).join(', ')] = flag;
   
-//   // Track the flag
-//   aliases.forEach(function (alias) {
-//     this._flags[alias] = flag;
-//   }, this);
+  // Track the flag
+  aliases.forEach(function (alias) {
+    this._flags[alias] = flag;
+  }, this);
   
-//   return flag
-// };
+  return flag
+};
 
-// Nash.prototype.executeFlag = function (flag) {
-//   if (!this._flags[flag]) return;
-//   this._flags[flag].fn(this);
-//   return this._flags[flag].options;
-// };
+Nash.prototype.executeFlag = function (flag) {
+  if (!this._flags[flag]) return;
+  this._flags[flag].fn(this);
+  return this._flags[flag].options;
+};
 
 Nash.createCli = function (options) {
   return new Nash(options);
