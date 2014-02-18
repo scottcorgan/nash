@@ -17,7 +17,8 @@ var cli = Nash.createCli({
   description: 'My CLI description, cool!'
 });
 
-cli.flag('-p').description('this does something');
+cli.flag('-p')
+  .description('this does something');
 
 cli.command('list')
   .before(function (command, done) {

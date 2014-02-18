@@ -17,7 +17,7 @@ var Nash = function (options) {
   this._flags = {};
   this._before = [];
   this._beforeMethods = [];
-  this._helpers = {};
+  this.methods = {};
   this._catchAll = function () {};
   
   this.debug = (options.debug === undefined) ? true : options.debug;
@@ -38,8 +38,16 @@ Nash.prototype.run = function (argv) {
   var cli = this;
   var input = this.args = parse.input(minimist(argv.slice(2)));
   var command = this.getCommand(input.command);
+  var helpWithCommand = help.forCommmand(input)
   
-  if (this._runFlags(input)) return; // Execute flags
+  if (helpWithCommand) {
+    var command = cli.getCommand('help')
+    input.task = 'detail';
+    input.command = 'help';
+    input.args[0] = helpWithCommand;
+  }
+  
+  if (!helpWithCommand && this._runFlags(input)) return; // Execute flags
   
   if (!command) return this._catchAll('command', input.command); // No command found or invalid command
   if (input.task && !command.isTask(input.task)) return this._catchAll('task', input.task);
@@ -161,8 +169,8 @@ Nash.prototype.executeFlag = function (flag) {
   return this._flags[flag].options;
 };
 
-Nash.prototype.helper = function (name, fn) {
-  this._helpers[name] = fn;
+Nash.prototype.method = function (name, fn) {
+  this.methods[name] = fn;
 };
 
 Nash.prototype.catchAll = function (fn) {
