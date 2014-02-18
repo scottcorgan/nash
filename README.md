@@ -20,6 +20,10 @@ var cli = Nash.createCli({
 cli.flag('-p').description('this does something');
 
 cli.command('list')
+  .before(function (command, done) {
+    // Do something before
+    done();
+  })
   .handler(function (done) {
     // Do something here
     done();

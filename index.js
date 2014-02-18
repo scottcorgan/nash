@@ -18,6 +18,7 @@ var Nash = function (options) {
   this._before = [];
   this._beforeMethods = [];
   this._helpers = {};
+  this._catchAll = function () {};
   
   this.debug = (options.debug === undefined) ? true : options.debug;
   this.args = options.args;
@@ -34,26 +35,21 @@ var Nash = function (options) {
 
 // Run the input as a cli command
 Nash.prototype.run = function (argv) {
-  var input = parse.input(minimist(argv.slice(2)));
+  var cli = this;
+  var input = this.args = parse.input(minimist(argv.slice(2)));
   var command = this.getCommand(input.command);
   
   if (this._runFlags(input)) return; // Execute flags
-  if (!command) return feedback.error('Invalid command'); // No command found or invalid command
+  
+  if (!command) return this._catchAll('command', input.command); // No command found or invalid command
+  if (input.task && !command.isTask(input.task)) return this._catchAll('task', input.task);
   
   // exectute task
-  if (input.task) {
-    
-    // TODO: handle beforeCommands with tasks to
-    
-    if (!command.isTask(input.task)) return feedback.error('Invalid command');
-    command.executeTask(input.task, input.args, function (err) {
-      if (err) return cli.error(err);
-    });
-  }
-  else {
-    command.execute(input.args, function (err) {
-      if (err) cli.error(err);
-    });
+  if (input.task) command.executeTask(input.task, input.args, executionComplete);
+  else command.execute(input.args, executionComplete);
+  
+  function executionComplete (err) {
+    if (err) cli.error(err);
   }
 };
 
@@ -166,6 +162,11 @@ Nash.prototype.helper = function (name, fn) {
   this._helpers[name] = fn;
 };
 
+Nash.prototype.catchAll = function (fn) {
+  this._catchAll = fn;
+};
+
+//
 Nash.createCli = function (options) {
   return new Nash(options);
 };
