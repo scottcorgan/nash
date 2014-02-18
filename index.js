@@ -92,7 +92,7 @@ Nash.prototype.command = function () {
   });
   
   // Track commands for help output
-  this._commandsWithCombinedAlias[commandAliases.join(', ')] = command;
+  this._commandsWithCombinedAlias[command._aliases.join(', ')] = command;
   
   // Track our commands
   _.each(commandAliases, function (alias) {
@@ -121,6 +121,8 @@ Nash.prototype.command = function () {
 };
 
 Nash.prototype.getCommand = function (alias) {
+  if (!alias) return;
+  
   return _.find(this._commands, function (command, key) {
     return key.split(' ')[0].toLowerCase() === alias.toLowerCase();
   });
