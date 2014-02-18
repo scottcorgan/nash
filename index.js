@@ -121,7 +121,9 @@ Nash.prototype.command = function () {
 };
 
 Nash.prototype.getCommand = function (alias) {
-  return this._commands[alias];
+  return _.find(this._commands, function (command, key) {
+    return key.split(' ')[0].toLowerCase() === alias.toLowerCase();
+  });
 };
 
 Nash.prototype.log = function (msg, options) {
