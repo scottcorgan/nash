@@ -49,7 +49,10 @@ Nash.prototype.run = function (argv) {
   else command.execute(input.args, executionComplete);
   
   function executionComplete (err) {
-    if (err) cli.error(err);
+    if (err) {
+      cli.error(err);
+      process.exit(1);
+    }
   }
 };
 
