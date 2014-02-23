@@ -132,6 +132,7 @@ Nash.prototype.log = function (msg, options) {
   var logger = 'info';
   
   if (options && options.success) logger = 'success';
+  if (options && options.warning) logger = 'warn';
   if (this._shouldDebug(options)) return feedback[logger](msg);
 };
 
