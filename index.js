@@ -40,16 +40,16 @@ Nash.prototype.run = function (argv) {
   var command = this.getCommand(input.command);
   var helpWithCommand = help.forCommmand(input)
   
+  if (!command) return this._catchAll('command', input.command); // No command found or invalid command
+  
   if (helpWithCommand) {
-    var command = cli.getCommand('help')
+    var command = cli.getCommand('help');
     input.task = 'detail';
     input.command = 'help';
     input.args[0] = helpWithCommand;
   }
   
   if (!helpWithCommand && this._runFlags(input)) return; // Execute flags
-  
-  if (!command) return this._catchAll('command', input.command); // No command found or invalid command
   if (input.task && !command.isTask(input.task)) return this._catchAll('task', input.task);
   
   // exectute task
