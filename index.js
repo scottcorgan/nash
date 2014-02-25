@@ -50,7 +50,7 @@ Nash.prototype.run = function (argv) {
   }
   
   if (!helpWithCommand && this._runFlags(input)) return; // Execute flags
-  if (input.task && !command.isTask(input.task)) return this._catchAll('task', input.task);
+  if (input.task && !command.getTask(input.task)) return this._catchAll('task', input.task);
   
   // exectute task
   if (input.task) command.executeTask(input.task, input.args, executionComplete);
