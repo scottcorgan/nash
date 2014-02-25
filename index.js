@@ -8,7 +8,8 @@ var Command = require('./lib/command');
 var Flag = require('./lib/flag');
 var shortcut = require('./lib/shortcut');
 var help = require('./lib/help');
-var drainer = require('drainer');
+var runBefore = require('./lib/helpers/run-before');
+var addBeforeMethods = require('./lib/helpers/add-before-methods');
 
 var Nash = function (options) {
   this._commands = {};
@@ -17,6 +18,7 @@ var Nash = function (options) {
   this._flags = {};
   this._before = [];
   this._beforeMethods = [];
+  this._beforeAll = [];
   this.methods = {};
   this._catchAll = function () {};
   
@@ -52,9 +54,14 @@ Nash.prototype.run = function (argv) {
   if (!helpWithCommand && this._runFlags(input)) return; // Execute flags
   if (input.task && !command.getTask(input.task)) return this._catchAll('task', input.task);
   
-  // exectute task
-  if (input.task) command.executeTask(input.task, input.args, executionComplete);
-  else command.execute(input.args, executionComplete);
+  // Run beforeAll methods
+  runBefore(this._beforeAll, command, function (err) {
+    if (err) return executionComplete(err);
+    
+    // exectute task
+    if (input.task) command.executeTask(input.task, input.args, executionComplete);
+    else command.execute(input.args, executionComplete);
+  });
   
   function executionComplete (err) {
     if (err) {
@@ -176,6 +183,11 @@ Nash.prototype.executeFlag = function (flag) {
 
 Nash.prototype.method = function (name, fn) {
   this.methods[name] = fn;
+};
+
+Nash.prototype.beforeAll = function () {
+  this._beforeAll.concat(addBeforeMethods(this.methods, arguments))
+  return this;
 };
 
 Nash.prototype.catchAll = function (fn) {
