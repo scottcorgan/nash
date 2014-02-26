@@ -42,8 +42,6 @@ Nash.prototype.run = function (argv) {
   var command = this.getCommand(input.command);
   var helpWithCommand = help.forCommmand(input)
   
-  if (!command) return this._catchAll('command', input.command); // No command found or invalid command
-  
   if (helpWithCommand) {
     var command = cli.getCommand('help');
     input.task = 'detail';
@@ -53,6 +51,7 @@ Nash.prototype.run = function (argv) {
   
   if (!helpWithCommand && this._runFlags(input)) return; // Execute flags
   if (input.task && !command.getTask(input.task)) return this._catchAll('task', input.task);
+  if (!command) return this._catchAll('command', input.command); // No command found or invalid command
   
   // Run beforeAll methods
   runBefore(this._beforeAll, command, function (err) {
@@ -132,7 +131,7 @@ Nash.prototype.getCommand = function (alias) {
   if (!alias) return;
   
   return _.find(this._commands, function (command, key) {
-    return key.split(' ')[0].toLowerCase() === alias.toLowerCase();
+    return Command._rootAlias(key) === alias.toLowerCase();
   });
 };
 
