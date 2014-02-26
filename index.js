@@ -103,6 +103,7 @@ Nash.prototype.command = function () {
   
   // Track our commands
   _.each(commandAliases, function (alias) {
+    alias = Command._rootAlias(alias);
     this._commands[alias] = command; // add to command collection
     this.commands[alias] = shortcut(this, command); // create shortcut
   }, this);
