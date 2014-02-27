@@ -1,6 +1,6 @@
 {
   "name": "nash",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Command-line masterpieces",
   "main": "index.js",
   "scripts": {
