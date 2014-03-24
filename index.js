@@ -144,6 +144,7 @@ Nash.prototype.log = function (msg, options) {
 };
 
 Nash.prototype.logObject = function (obj, options) {
+  if (!options) options = {};
   if (!obj) obj = {};
   if (this._shouldDebug(options)) print(obj, options);
 };
