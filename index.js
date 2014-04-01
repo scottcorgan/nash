@@ -54,7 +54,7 @@ Nash.prototype.run = function (argv) {
   if (!command) return this._catchAll('command', input.command); // No command found or invalid command
   
   // Run beforeAll methods
-  runBefore(this._beforeAll, command, function (err) {
+  runBefore(_.values(this.methods), command, function (err) {
     if (err) return executionComplete(err);
     
     // exectute task
