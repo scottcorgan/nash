@@ -1,5 +1,7 @@
 # nash
 
+**(Readme Incomplete)**
+
 Command-line masterpieces
 
 ## Install
