@@ -19,6 +19,7 @@ var Nash = function (options) {
   this._flags = {};
   this.methods = new Qmap();
   this._catchAll = function () {};
+  this._commandName = options.commandName;
 
   this.debug = (options.debug === undefined) ? true : options.debug;
   this.args = options.args;
@@ -188,6 +189,11 @@ Nash.prototype.executeFlag = function (flag) {
 
 Nash.prototype.method = function (name, fn) {
   this.methods.method(name, fn);
+  return this;
+};
+
+Nash.prototype.usage = function (usage) {
+  this._usage = usage;
   return this;
 };
 
