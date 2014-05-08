@@ -9,6 +9,8 @@ var Command = require('./lib/command');
 var Flag = require('./lib/flag');
 var shortcut = require('./lib/shortcut');
 var help = require('./lib/help');
+var EventEmitter = require('events').EventEmitter;
+var util = require('util');
 
 var Nash = function (options) {
   options = options || {};
@@ -32,7 +34,12 @@ var Nash = function (options) {
 
   // set up default help function
   help(this);
+  
+  // Call parent constructor
+  EventEmitter.call(this);
 };
+
+util.inherits(Nash, EventEmitter);
 
 // Run the input as a cli command
 Nash.prototype.run = function (argv) {
@@ -145,24 +152,24 @@ Nash.prototype.log = function (msg, options) {
 
   if (options && options.success) logger = 'success';
   if (options && options.warning) logger = 'warn';
-  if (this._shouldDebug(options)) return feedback[logger](msg);
+  
+  if (!this._shouldDebug(options)) return;
+  
+  this.emit('data', msg);
+  this.emit(logger, msg);
 };
 
 Nash.prototype.logObject = function (obj, options) {
-  if (!options) options = {};
-  if (!obj) obj = {};
-  if (this._shouldDebug(options)) print(obj, options);
+  this.log(obj, options);
 };
 
-Nash.prototype.error = function (msg) {
-  if (this.debug) {
-    feedback.error(msg);
-    process.exit(1);
-  }
+Nash.prototype.error = function (msg, options) {
+  if (this._shouldDebug(options)) this.emit('error', msg);
+  process.exit(1);
 };
 
 Nash.prototype._shouldDebug = function (options) {
-  return (this.debug || (options && options.debug))
+  return this.debug || (options && options.debug);
 };
 
 Nash.prototype.flag = function () {
