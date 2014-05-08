@@ -75,10 +75,7 @@ Nash.prototype.run = function (argv) {
   // });
   
   function executionComplete (err) {
-    if (err) {
-      cli.error(err);
-      process.exit(1);
-    }
+    if (err) cli.error(err);
   }
 };
 
@@ -165,7 +162,6 @@ Nash.prototype.logObject = function (obj, options) {
 
 Nash.prototype.error = function (msg, options) {
   if (this._shouldDebug(options)) this.emit('error', msg);
-  process.exit(1);
 };
 
 Nash.prototype._shouldDebug = function (options) {
