@@ -45,6 +45,7 @@ util.inherits(Nash, EventEmitter);
 Nash.prototype.run = function (argv) {
   var cli = this;
   var input = this.args = parse.input(minimist(argv.slice(2)));
+  
   var command = this.getCommand(input.command);
   var helpWithCommand = help.forCommmand(input)
 

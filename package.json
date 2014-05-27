@@ -1,6 +1,6 @@
 {
   "name": "nash",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Command-line masterpieces",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "homepage": "https://github.com/scottcorgan/nash",
   "dependencies": {
     "lodash": "~2.4.1",
-    "minimist": "0.0.7",
+    "minimist": "^0.1.0",
     "feedback": "~0.3.2",
     "pretty-print": "0.4.x",
     "args-list": "~0.3.1",
