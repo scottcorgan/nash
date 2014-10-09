@@ -53,6 +53,14 @@ test('proto: runs command', function (t) {
   t.end();
 });
 
+test('proto: sets argv on cli level', function (t) {
+  
+  proto.run(['', '', 'command', '-f', 'value']);
+  
+  t.deepEqual(proto.argv, { _: [ 'command' ], f: 'value' }, 'argv set on proto');
+  t.end();
+});
+
 test('proto: runs command task', function (t) {
   
   proto._commands = [];

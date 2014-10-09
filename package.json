@@ -38,7 +38,8 @@
     "sorted-object": "~1.0.0"
   },
   "devDependencies": {
-    "tape": "^3.0.0",
-    "tap-spec": "^1.0.0"
+    "tap-dot": "^0.2.3",
+    "tap-spec": "^1.0.0",
+    "tape": "^3.0.0"
   }
 }
