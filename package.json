@@ -24,15 +24,16 @@
   },
   "homepage": "https://github.com/scottcorgan/nash",
   "dependencies": {
-    "lodash": "~2.4.1",
-    "minimist": "^0.1.0",
-    "feedback": "~0.3.2",
-    "pretty-print": "0.4.x",
     "args-list": "~0.3.1",
-    "drainer": "~0.2.1",
+    "as-array": "^1.0.0",
     "chalk": "~0.4.0",
-    "sorted-object": "~1.0.0",
+    "drainer": "~0.2.1",
+    "feedback": "~0.3.2",
+    "flat-arguments": "0.3.x",
+    "lodash": "^2.4.1",
+    "minimist": "^0.1.0",
+    "pretty-print": "0.4.x",
     "qmap": "0.2.x",
-    "flat-arguments": "0.3.x"
+    "sorted-object": "~1.0.0"
   }
 }
