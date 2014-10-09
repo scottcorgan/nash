@@ -13,6 +13,16 @@ test('command: extends EventEmitter', function (t) {
   t.end();
 });
 
+test('command: noop', function (t) {
+  
+  t.doesNotThrow(function () {
+    command.noop()
+  }, undefined, 'defined function');
+  t.deepEqual(typeof command.noop(), 'object', 'blank command');
+  
+  t.end();
+});
+
 test('command: handler', function (t) {
   
   var handlerCalled = false;
