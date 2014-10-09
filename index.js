@@ -7,7 +7,9 @@ var exports = module.exports = createCli;
 
 function createCli (options) {
   
-  var cli = {};
+  var cli = {
+    options: options
+  };
   
   mixin(cli, proto);
   mixin(cli, EventEmitter.prototype);
