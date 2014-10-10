@@ -1,15 +1,17 @@
 var nash = require('../lib/index');
 var command = require('../lib/command');
+var flag = require('../lib/flag');
 var test = require('tape');
 
 test('cli: defaults', function (t) {
   
   var cli = nash();
   
-  t.deepEqual(cli._commands, [], 'blank command collection');
-  t.deepEqual(cli._beforeAlls, [], 'blank beforeAlls collection');
-  t.deepEqual(cli._afterAlls, [], 'blank afterAlls collection');
-  t.equal(typeof cli._onInvalidCommand, 'function', 'default on invalid command function');
+  t.deepEqual(cli.internals.commands, [], 'blank command collection');
+  t.deepEqual(cli.internals.flags, [], 'blank flag collection');
+  t.deepEqual(cli.internals.beforeAlls, [], 'blank beforeAlls collection');
+  t.deepEqual(cli.internals.afterAlls, [], 'blank afterAlls collection');
+  t.equal(typeof cli.internals.onInvalidCommand, 'function', 'default on invalid command function');
   t.end();
 });
 
@@ -43,9 +45,56 @@ test('cli: command', function (t) {
   var cli = nash();
   var cmd = cli.command('test');
   
-  t.deepEqual(cli._commands, [cmd], 'adds command to collection');
-  t.deepEqual(cli.command('test', 't').name(), command(['test', 't']).name(), 'creates instance of command');
+  cmd.description('command description');
+  
+  t.deepEqual(cli.internals.commands, [cmd], 'adds command to collection');
+  t.deepEqual(cli.command('test', 't').name(), command('test', 't').name(), 'creates instance of command');
+  // t.equal(cli.command('test').description(), 'command description', 'return command if already defined');
   t.end();
+});
+
+test('cli: flags', function (t) {
+  
+  var cli = nash();
+  var flg = cli.flag('--test', '-t');
+  
+  flg.description('flag description');
+  
+  t.deepEqual(cli.internals.flags, [flg], 'adds flag to collection');
+  t.deepEqual(cli.flag('--test', '-t').name(), flag('--test', '-t').name(), 'creates instance of flag');
+  t.equal(cli.flag('-t').description(), 'flag description', 'return flag if already defined');
+  t.end();
+});
+
+test('cli: runs flags', function (t) {
+  
+  var cli = nash();
+  var flagCalled1 = false;
+  var flagCalled2 = false;
+  
+  cli.flag('-f')
+    .handler(function (val) {
+      
+      flagCalled1 = true;
+      t.equal(val, 'test value1', 'passes value 1');
+    });
+  cli.flag('-t')
+    .handler(function (val) {
+      
+      flagCalled2 = true;
+      t.equal(val, 'test value2', 'passes value 2');
+    });
+  
+  cli.runFlags({
+    f: 'test value1',
+    t: 'test value2'
+  }, function (err) {
+    
+    t.ok(flagCalled1, 'ran flag 1 handler');
+    t.ok(flagCalled2, 'ran flag 2 handler');
+    t.end();
+  });
+  
 });
 
 test('cli: run method is chainable', function (t) {
@@ -72,16 +121,21 @@ test('cli: runs command', function (t) {
     callstack.push('afterAll');
     next();
   });
+  cli.flag('-t')
+    .handler(function () {
+      
+      callstack.push('flag');
+    });
   cli.command('test')
     .handler(function () {
       
       callstack.push('command');
       handlerCalled = true;
     });
-  cli.run(['', '', 'test']);
+  cli.run(['', '', 'test', '-t']);
   
   t.ok(handlerCalled, 'runs the command');
-  t.deepEqual(callstack, ['beforeAll', 'command', 'afterAll'], 'execution order');
+  t.deepEqual(callstack, ['beforeAll', 'flag', 'command', 'afterAll'], 'execution order');
   
   callstack = [];
   handlerCalled = false;
@@ -170,11 +224,6 @@ test('cli: runs afterAlls', function (t) {
     t.deepEqual(chained, cli, 'chainable');
     t.end();
   });
-});
-
-test('cli: runs cli level flags', function (t) {
-  
-  t.end();
 });
 
 test('cli: finds a command', function (t) {
