@@ -7,6 +7,7 @@ test('proto: defaults', function (t) {
   t.deepEqual(proto._commands, [], 'blank command collection');
   t.deepEqual(proto._beforeAlls, [], 'blank beforeAlls collection');
   t.deepEqual(proto._afterAlls, [], 'blank afterAlls collection');
+  t.equal(typeof proto._onInvalidCommand, 'function', 'default on invalid command function');
   t.end();
 });
 
@@ -163,5 +164,31 @@ test('proto: finds a command task', function (t) {
   
   t.deepEqual(proto.findCommandTask('test', 'task'), task, 'by command name and command task name');
   t.notOk(proto.findCommand('test', 'notTask'), 'no task found');
+  t.end();
+});
+
+test('proto: on invalid command', function (t) {
+  
+  var commandCalled = false;
+  
+  proto._commands = [];
+  proto._beforeAlls = [];
+  proto._afterAlls = [];
+  
+  var chain = proto.onInvalidCommand(function (commandName, data, flags, next) {
+    
+    commandCalled = true;  
+    
+    t.equal(commandName, 'noop', 'passes in command name');
+    t.deepEqual(data, ['data'], 'passes in data');
+    t.deepEqual(flags, {t: 'flagged'}, 'passes in flags');
+    
+    next();
+  });
+  
+  proto.run(['', '', 'noop', 'data', '-t', 'flagged']);
+  
+  t.ok(commandCalled, 'ran');
+  t.deepEqual(chain, proto, 'chainable');
   t.end();
 });
