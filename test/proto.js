@@ -5,6 +5,8 @@ var test = require('tape');
 test('proto: defaults', function (t) {
   
   t.deepEqual(proto._commands, [], 'blank command collection');
+  t.deepEqual(proto._beforeAlls, [], 'blank beforeAlls collection');
+  t.deepEqual(proto._afterAlls, [], 'blank afterAlls collection');
   t.end();
 });
 
@@ -27,17 +29,34 @@ test('proto: run method is chainable', function (t) {
 
 test('proto: runs command', function (t) {
   
-  proto._commands = [];
+  // TODO: test the run callstack
   var handlerCalled = false;
+  var callstack = [];
+  
+  proto._commands = [];
+  
+  proto.beforeAll(function (data, flags, next) {
+    
+    callstack.push('beforeAll');
+    next();
+  });
+  proto.afterAll(function (data, flags, next) {
+    
+    callstack.push('afterAll');
+    next();
+  });
   proto.command('test')
     .handler(function () {
       
+      callstack.push('command');
       handlerCalled = true;
     });
   proto.run(['', '', 'test']);
   
   t.ok(handlerCalled, 'runs the command');
+  t.deepEqual(callstack, ['beforeAll', 'command', 'afterAll'], 'execution order');
   
+  callstack = [];
   proto._commands = [];
   handlerCalled = false;
   proto.command('test')
@@ -79,9 +98,53 @@ test('proto: runs command task', function (t) {
   t.end();
 });
 
-test('proto: runs beforeAlls');
+test('proto: runs beforeAlls', function (t) {
+  
+  var beforeAllRan = false;
+  
+  proto._beforeAlls = [];
+  var chained = proto.beforeAll(function (data, flags, next) {
+    
+    beforeAllRan = true;
+    
+    t.deepEqual(data, ['data'], 'passed in data');
+    t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+    
+    next();
+  });
+  
+  proto.runBeforeAlls(['data'], {t: 'flagged'}, function () {
+    
+    t.ok(beforeAllRan, 'all methods ran');
+    t.deepEqual(chained, proto, 'chainable');
+    t.end();
+  });
+});
+
+test('proto: runs afterAlls', function (t) {
+  
+  var afterAllRan = false;
+  
+  proto._afterAlls = [];
+  var chained = proto.afterAll(function (data, flags, next) {
+    
+    afterAllRan = true;
+    
+    t.deepEqual(data, ['data'], 'passed in data');
+    t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+    
+    next();
+  });
+  
+  proto.runAfterAlls(['data'], {t: 'flagged'}, function () {
+    
+    t.ok(afterAllRan, 'all methods ran');
+    t.deepEqual(chained, proto, 'chainable');
+    t.end();
+  });
+});
+
 test('proto: runs cli level flags');
-test('proto: runs afterAlls');
 
 test('proto: finds a command', function (t) {
   
