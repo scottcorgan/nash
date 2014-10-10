@@ -45,7 +45,7 @@ test('command: task', function (t) {
   
   task.usage('usage1');
   
-  t.deepEqual(cmd._tasks, [task], 'sets up task in collection');
+  t.deepEqual(cmd.internals.tasks, [task], 'sets up task in collection');
   t.equal(cmd.task('task').usage(), 'usage1', 'return task if already defined');
   t.equal(task.task, undefined, 'does not allow tasks to create tasks on itself');
   t.end();
@@ -58,7 +58,7 @@ test('command: flag', function (t) {
   
   flg.description('flag description');
   
-  t.deepEqual(cmd._flags, [flg], 'sets up flag in collection');
+  t.deepEqual(cmd.internals.flags, [flg], 'sets up flag in collection');
   t.equal(cmd.flag('--test').description(), 'flag description', 'return flag if already defined');
   t.end();
 });
