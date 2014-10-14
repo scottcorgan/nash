@@ -24,7 +24,6 @@ test('cli: instance options', function (t) {
   var cli = nash(options);
   
   t.deepEqual(cli.options, options, 'adds options to instance');
-  
   t.end();
 });
 

@@ -29,17 +29,17 @@ test('flag: handler', function (t) {
   t.end();
 });
 
-test('flag: getters and settings', function (t) {
+test('flag: setting values', function (t) {
   
   var flg = flag('-f')
     .description('description')
     .usage('usage')
     .hidden(true)
-    .exit(true);
+    .exit();
   
   t.deepEqual(flg.name(), ['-f'], 'name');
-  t.equal(flg.hidden(), true, 'hidden');
-  t.equal(flg.exit(), true, 'hidden');
+  t.equal(flg.isHidden(), true, 'hidden');
+  t.equal(flg.shouldExit(), true, 'hidden');
   t.equal(flg.description(), 'description', 'description');
   t.equal(flg.usage(), 'usage', 'usage');
   t.end();
@@ -81,8 +81,7 @@ test('flag: exits process on complete', function (t) {
     exitedProcess = true;
   };
   
-  flg.exit(true);
-  flg.run();
+  flg.exit().run();
   
   t.ok(exitedProcess, 'exited process');
   t.end();

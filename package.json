@@ -4,7 +4,7 @@
   "description": "Craft Command-line Masterpieces",
   "main": "lib/index.js",
   "scripts": {
-    "test": "tape test/** | tap-spec"
+    "test": "tape test/** | tap-dot"
   },
   "repository": {
     "type": "git",
