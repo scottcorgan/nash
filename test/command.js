@@ -94,12 +94,12 @@ test('command: getters and settings', function (t) {
   var cmd = command('test')
     .description('description')
     .usage('usage')
-    .hidden(true)
+    .hidden()
     .before(function () {})
     .after(function () {});
   
   t.deepEqual(cmd.name(), ['test'], 'name');
-  t.equal(cmd.hidden(), true, 'hidden');
+  t.equal(cmd.isHidden(), true, 'hidden');
   t.equal(cmd.description(), 'description', 'description');
   t.equal(cmd.usage(), 'usage', 'usage');
   t.equal(cmd.before().length, 1, 'before');

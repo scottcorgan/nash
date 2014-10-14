@@ -81,7 +81,9 @@ test('flag: exits process on complete', function (t) {
     exitedProcess = true;
   };
   
-  flg.exit().run();
+  flg
+    .exit()
+    .run();
   
   t.ok(exitedProcess, 'exited process');
   t.end();
