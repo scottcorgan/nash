@@ -63,7 +63,7 @@ test('command: flag', function (t) {
   t.end();
 });
 
-test('command: find a task', function (t) {
+test.only('command: find a task', function (t) {
   
   var cmd = command('test');
   
@@ -89,7 +89,7 @@ test('command: find a flag', function (t) {
   t.end();
 });
 
-test('command: getters and settings', function (t) {
+test('command: getters and setters', function (t) {
   
   var cmd = command('test')
     .description('description')

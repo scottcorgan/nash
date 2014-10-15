@@ -29,7 +29,7 @@ test('flag: handler', function (t) {
   t.end();
 });
 
-test('flag: setting values', function (t) {
+test('flag: getters and setters', function (t) {
   
   var flg = flag('-f')
     .description('description')

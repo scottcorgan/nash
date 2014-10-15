@@ -42,13 +42,14 @@ test('cli: extends EventEmitter', function (t) {
 test('cli: command', function (t) {
   
   var cli = nash();
-  var cmd = cli.command('test');
+  var cmd = cli.command('test', 't');
   
   cmd.description('command description');
   
   t.deepEqual(cli.internals.commands, [cmd], 'adds command to collection');
   t.deepEqual(cli.command('test', 't').name(), command('test', 't').name(), 'creates instance of command');
-  // t.equal(cli.command('test').description(), 'command description', 'return command if already defined');
+  t.equal(cli.command('test').description(), 'command description', 'return command if already defined');
+  t.equal(cli.command('t').description(), 'command description', 'return command if already defined');
   t.end();
 });
 
