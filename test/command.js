@@ -245,4 +245,85 @@ test('command: running the command', function (t) {
   });
 });
 
+test('command: deprecated command exits by default', function (t) {
+  
+  t.plan(6);
+  
+  var handlerCalled = false;
+  var flagCalled = false;
+  var beforeCalled = false;
+  var afterCalled = false;
+  var cmd = command('test')
+    .deprecate('test has been deprecated')
+    .handler(function () {
+      
+      handlerCalled = true;
+    })
+    .before(function (data, flags, done) {
+      
+      beforeCalled = true;
+      done();
+    })
+    .after(function (data, flags, done) {
+      
+      afterCalled = true;
+      done();
+    });
+  
+  cmd.flag('-t')
+    .handler(function () {
+      flagCalled = true;
+    });
+  
+  cmd.on('warning', function (msg) {
+    
+    t.equal(msg, 'test has been deprecated', 'warning message');
+  });
+  
+  cmd.run({}, {t: true}, function () {
+    
+    t.ok(cmd.isDeprecated(), 'deprecated getter');
+    t.notOk(handlerCalled, 'handler not called');
+    t.notOk(flagCalled, 'flag not called');
+    t.notOk(beforeCalled, 'before not called')
+    t.notOk(afterCalled, 'after not called')
+  });
+});
+
+test('command: deprecated command does not exit with options', function (t) {
+  
+  t.plan(2);
+  
+  var handlerCalled = false;
+  var cmd = command('test')
+    .deprecate('test has been deprecated', {
+      exit: false
+    })
+    .handler(function () {
+      
+      handlerCalled = true;
+    });
+  
+  cmd.on('warning', function (msg) {
+    
+    t.equal(msg, 'test has been deprecated');
+  });
+  
+  cmd.run();
+  
+  t.ok(handlerCalled, 'handler called');
+});
+
+test('command: deprecatedShouldExit()', function (t) {
+  
+  var cmd1 = command('test').deprecate('deprecated');
+  var cmd2 = command('test').deprecate('deprecated', {
+    exit: false
+  });
+  
+  t.ok(cmd1.deprecatedShouldExit(), '(default) should exit');
+  t.notOk(cmd2.deprecatedShouldExit(), 'should not exit');
+  t.end();
+});
+
 
