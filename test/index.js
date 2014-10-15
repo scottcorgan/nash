@@ -71,6 +71,16 @@ test('cli: runs flags', function (t) {
   var cli = nash();
   var flagCalled1 = false;
   var flagCalled2 = false;
+  var cliOverrideFlagCalled = false;
+  var flagOverrideCalled = false;
+  
+  // Set up override flag
+  var overrideFlag = flag('-o')
+    .override()
+    .handler(function () {
+      
+      flagOverrideCalled = true;
+    });
   
   cli.flag('-f')
     .handler(function (val) {
@@ -84,16 +94,27 @@ test('cli: runs flags', function (t) {
       flagCalled2 = true;
       t.equal(val, 'test value2', 'passes value 2');
     });
+  cli.flag('-o')
+    .handler(function () {
+      
+      cliOverrideFlagCalled = true;
+    });
   
   cli.runFlags({
     f: 'test value1',
-    t: 'test value2'
+    t: 'test value2', 
+    o: true
   }, function (err) {
     
     t.ok(flagCalled1, 'ran flag 1 handler');
     t.ok(flagCalled2, 'ran flag 2 handler');
+    t.notOk(cliOverrideFlagCalled, 'did not call cli flag');
+    t.ok(flagOverrideCalled, 'called flag override');
     t.end();
-  });
+  },
+    // Flag override values
+    [overrideFlag]
+  );
   
 });
 
@@ -158,6 +179,7 @@ test('cli: command level flags can override cli level flags', function (t) {
   var cli = nash();
   var cliFlagCalled = false;
   var commandFlagCalled = false;
+  var commandFlagCallCount = 0;
   
   cli.flag('-t')
     .handler(function () {
@@ -170,6 +192,7 @@ test('cli: command level flags can override cli level flags', function (t) {
       .override()
       .handler(function () {
         
+        commandFlagCallCount += 1;
         commandFlagCalled = true;
       });
   
@@ -177,6 +200,7 @@ test('cli: command level flags can override cli level flags', function (t) {
   
   t.ok(commandFlagCalled, 'command flag');
   t.notOk(cliFlagCalled, 'cli flag');
+  t.equal(commandFlagCallCount, 1, 'flag only called once');
   t.end();
 });
 
@@ -184,7 +208,8 @@ test('cli: task level flags can override cli level flags', function (t) {
   
   var cli = nash();
   var cliFlagCalled = false;
-  var commandFlagCalled = false;
+  var taskFlagCalled = false;
+  var taskFlagCallCount = 0;
   
   cli.flag('-t')
     .handler(function () {
@@ -198,13 +223,15 @@ test('cli: task level flags can override cli level flags', function (t) {
         .override()
         .handler(function () {
           
-          commandFlagCalled = true;
+          taskFlagCallCount += 1;
+          taskFlagCalled = true;
         });
   
   cli.run(['', '', 'test:task', '-t']);
   
-  t.ok(commandFlagCalled, 'command flag');
+  t.ok(taskFlagCalled, 'command flag');
   t.notOk(cliFlagCalled, 'cli flag');
+  t.equal(taskFlagCallCount, 1, 'flag only called once');
   t.end();
 });
 

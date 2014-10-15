@@ -60,17 +60,22 @@ test('flag: matches flag name', function (t) {
 test('flag: running the flag', function (t) {
   
   var flagCalled = false;
+  var flagCallCount = 0;
   var flg = flag('-t')
     .handler(function (data) {
       
-      flagCalled = true
+      flagCalled = true;
+      flagCallCount += 1;
       
       t.equal(data, 'data', 'flag value');
     });
   
   flg.run('data');
+  flg.runOnce('data');
   
   t.ok(flagCalled, 'ran flag');
+  t.equal(flagCallCount, 1, 'called only once when using runOnce()');
+  t.true(flg.internals.ran, 'flag ran set to true');
   t.end();
 });
 

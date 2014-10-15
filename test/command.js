@@ -176,14 +176,20 @@ test('command: runs flags', function (t) {
   var cmd = command('test');
   var flagCalled1 = false;
   var flagCalled2 = false;
+  var flag1CallCount = 0;
+  var flag2CallCount = 0;
   
   cmd.flag('-f')
     .handler(function (val) {
+      
+      flag1CallCount += 1;
       flagCalled1 = true;
       t.equal(val, 'test value1', 'passes value 1');
     });
   cmd.flag('-t')
     .handler(function (val) {
+      
+      flag2CallCount += 1;
       flagCalled2 = true;
       t.equal(val, 'test value2', 'passes value 2');
     });
@@ -195,6 +201,14 @@ test('command: runs flags', function (t) {
   
   t.ok(flagCalled1, 'ran flag 1 handler');
   t.ok(flagCalled2, 'ran flag 2 handler');
+    
+  cmd.runFlags({
+    f: 'test value1',
+    t: 'test value2'
+  });
+  
+  t.equal(flag1CallCount, 1, 'flag 1 called only once');
+  t.equal(flag2CallCount, 1, 'flag 1 called only once');
   t.end();
 });
 
