@@ -58,7 +58,7 @@ test('command: flag', function (t) {
   
   flg.description('flag description');
   
-  t.deepEqual(cmd.internals.flags, [flg], 'sets up flag in collection');
+  t.deepEqual(cmd.internals.flags.all(), [flg], 'sets up flag in collection');
   t.equal(cmd.flag('--test').description(), 'flag description', 'return flag if already defined');
   t.end();
 });
