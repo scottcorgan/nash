@@ -152,11 +152,17 @@ test('cli: runs command', function (t) {
       
       callstack.push('command');
       handlerCalled = true;
-    });
+    })
+    .flag('-t')
+      .handler(function () {
+        
+        commandFlagCalled = true;
+      });
   cli.run(['', '', 'test', '-t']);
   
   t.ok(handlerCalled, 'runs the command');
   t.deepEqual(callstack, ['beforeAll', 'flag', 'command', 'afterAll'], 'execution order');
+  t.ok(commandFlagCalled, 'calls cli and command flags if not overridden');
   
   callstack = [];
   handlerCalled = false;
