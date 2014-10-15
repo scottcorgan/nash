@@ -4,7 +4,7 @@
   "description": "Craft Command-line Masterpieces",
   "main": "lib/index.js",
   "scripts": {
-    "test": "npm run lint && tape test/** | tap-dot",
+    "test": "npm run lint && tape test/** | tap-spec",
     "lint": "jshint ./lib/**"
   },
   "repository": {

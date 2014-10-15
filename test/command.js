@@ -45,7 +45,7 @@ test('command: task', function (t) {
   
   task.usage('usage1');
   
-  t.deepEqual(cmd.internals.tasks, [task], 'sets up task in collection');
+  t.deepEqual(cmd.internals.tasks.all(), [task], 'sets up task in collection');
   t.equal(cmd.task('task').usage(), 'usage1', 'return task if already defined');
   t.equal(task.task, undefined, 'does not allow tasks to create tasks on itself');
   t.end();

@@ -43,6 +43,24 @@ test('commands: add command to collection', function (t) {
   t.end();
 });
 
+test('commands: does not overwrite command when adding to collection', function (t) {
+  
+  var cmds = commands();
+  
+  var cmd = defineCommand('test')
+    .description('test description');
+  
+  var cmd2 = defineCommand('test', 't');
+  
+  cmds.add(cmd);
+  cmds.add(cmd2);
+  
+  t.equal(cmds.all().length, 1, 'one uqique');
+  t.equal(cmds.findByName('test').description(), cmd.description(), 'same command descriptions');
+  t.ok(cmds.findByName('t'), 'adds missing names when commands match');
+  t.end();
+});
+
 test('commands: find command by name', function (t) {
   
   var cmd1 = defineCommand('test1', 't1', 'another');
