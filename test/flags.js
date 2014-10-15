@@ -41,6 +41,24 @@ test('flags: add flag to collection', function (t) {
   t.end();
 });
 
+test('flags: does not overwrite flag when adding to collection', function (t) {
+  
+  var flgs = flags();
+  
+  var flg = flag('--test')
+    .description('test description');
+  
+  var flg2 = flag('--test', '-t');
+  
+  flgs.add(flg);
+  flgs.add(flg2);
+  
+  t.equal(flgs.all().length, 1, 'one uqique');
+  t.equal(flgs.findByName('test').description(), flg.description(), 'same flg descriptions');
+  t.ok(flgs.findByName('-t'), 'adds missing names when flags match');
+  t.end();
+});
+
 test('flags: find flag by name', function (t) {
   
   var flg1 = flag('-t1', '--test1', '--another1');
