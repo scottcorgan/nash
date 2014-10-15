@@ -153,6 +153,38 @@ test('cli: runs command', function (t) {
   t.end();
 });
 
+test('cli: command level flags can override cli level flags', function (t) {
+  
+  var cli = nash();
+  var cliFlagCalled = false;
+  var commandFlagCalled = false;
+  
+  cli.flag('-t')
+    .handler(function () {
+      
+      cliFlagCalled = true;
+    });
+    
+  cli.command('test')
+    .flag('-t')
+      .override()
+      .handler(function () {
+        
+        commandFlagCalled = true;
+      });
+  
+  cli.run(['', '', 'test', '-t']);
+  
+  t.ok(commandFlagCalled, 'command flag');
+  t.notOk(cliFlagCalled, 'cli flag');
+  t.end();
+});
+
+test('cli: task level flags can override cli level flags', function (t) {
+  
+  t.end();
+});
+
 test('cli: sets argv on cli level', function (t) {
   
   var cli = nash();

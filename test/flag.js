@@ -35,6 +35,7 @@ test('flag: getters and setters', function (t) {
     .description('description')
     .usage('usage')
     .hidden(true)
+    .override(true)
     .exit();
   
   t.deepEqual(flg.name(), ['-f'], 'name');
@@ -42,6 +43,7 @@ test('flag: getters and setters', function (t) {
   t.equal(flg.shouldExit(), true, 'hidden');
   t.equal(flg.description(), 'description', 'description');
   t.equal(flg.usage(), 'usage', 'usage');
+  t.equal(flg.shouldOverride(), true, 'override');
   t.end();
 });
 
@@ -51,6 +53,7 @@ test('flag: matches flag name', function (t) {
   
   t.ok(flg.matchesName('--test'), 'matches single name');
   t.ok(flg.matchesName('-t'), 'matches other names');
+  t.ok(flg.matchesName(['-t']), 'accepts and array of names');
   t.end();
 });
 
