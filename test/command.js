@@ -63,7 +63,7 @@ test('command: flag', function (t) {
   t.end();
 });
 
-test.only('command: find a task', function (t) {
+test('command: find a task', function (t) {
   
   var cmd = command('test');
   
