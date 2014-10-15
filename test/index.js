@@ -1,6 +1,7 @@
 var nash = require('../lib/index');
 var command = require('../lib/command');
 var commands = require('../lib/commands');
+var flags = require('../lib/flags');
 var flag = require('../lib/flag');
 var test = require('tape');
 
@@ -9,7 +10,7 @@ test('cli: defaults', function (t) {
   var cli = nash();
   
   t.deepEqual(cli.internals.commands, commands(), 'blank command collection');
-  t.deepEqual(cli.internals.flags, [], 'blank flag collection');
+  t.deepEqual(cli.internals.flags, flags(), 'blank flag collection');
   t.deepEqual(cli.internals.beforeAlls, [], 'blank beforeAlls collection');
   t.deepEqual(cli.internals.afterAlls, [], 'blank afterAlls collection');
   t.equal(typeof cli.internals.onInvalidCommand, 'function', 'default on invalid command function');
@@ -61,7 +62,7 @@ test('cli: flags', function (t) {
   
   flg.description('flag description');
   
-  t.deepEqual(cli.internals.flags, [flg], 'adds flag to collection');
+  t.deepEqual(cli.internals.flags.all(), [flg], 'adds flag to collection');
   t.deepEqual(cli.flag('--test', '-t').name(), flag('--test', '-t').name(), 'creates instance of flag');
   t.equal(cli.flag('-t').description(), 'flag description', 'return flag if already defined');
   t.end();
