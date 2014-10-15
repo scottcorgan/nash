@@ -1,5 +1,6 @@
 var nash = require('../lib/index');
 var command = require('../lib/command');
+var commands = require('../lib/commands');
 var flag = require('../lib/flag');
 var test = require('tape');
 
@@ -7,7 +8,7 @@ test('cli: defaults', function (t) {
   
   var cli = nash();
   
-  t.deepEqual(cli.internals.commands, [], 'blank command collection');
+  t.deepEqual(cli.internals.commands, commands(), 'blank command collection');
   t.deepEqual(cli.internals.flags, [], 'blank flag collection');
   t.deepEqual(cli.internals.beforeAlls, [], 'blank beforeAlls collection');
   t.deepEqual(cli.internals.afterAlls, [], 'blank afterAlls collection');
@@ -46,7 +47,7 @@ test('cli: command', function (t) {
   
   cmd.description('command description');
   
-  t.deepEqual(cli.internals.commands, [cmd], 'adds command to collection');
+  t.deepEqual(cli.internals.commands.all(), [cmd], 'adds command to collection');
   t.deepEqual(cli.command('test', 't').name(), command('test', 't').name(), 'creates instance of command');
   t.equal(cli.command('test').description(), 'command description', 'return command if already defined');
   t.equal(cli.command('t').description(), 'command description', 'return command if already defined');
@@ -320,7 +321,12 @@ test('cli: finds a command', function (t) {
   var cmd = cli.command('test');
   
   t.deepEqual(cli.findCommand('test'), cmd, 'by command name');
-  t.notOk(cli.findCommand('test', 'task'), 'by command name with a task name');
+  
+  // TODO: why do we need to find a command with a task name if
+  // we have findCommandTask()?
+  // 
+  // t.notOk(cli.findCommand('test', 'task'), 'by command name with a task name');
+  
   t.end();
 });
 
@@ -330,7 +336,7 @@ test('cli: finds a command task', function (t) {
   var task = cli.command('test').task('task');
   
   t.deepEqual(cli.findCommandTask('test', 'task'), task, 'by command name and command task name');
-  t.notOk(cli.findCommand('test', 'notTask'), 'no task found');
+  t.notOk(cli.findCommandTask('test', 'notTask'), 'no task found');
   t.end();
 });
 
