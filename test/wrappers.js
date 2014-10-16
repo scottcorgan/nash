@@ -79,9 +79,9 @@ test('wrapprs: runs wrapper functions with given values passed into functions', 
   t.plan(2);  
   
   var wrap = wrappers();
-  
 
   wrap.add(function (val1, val2) {
+    
     t.equal(val1, 'val1', 'passed in value 1');
     t.equal(val2, 'val2', 'passed in value 2');
   });
@@ -89,6 +89,99 @@ test('wrapprs: runs wrapper functions with given values passed into functions', 
   wrap.run('val1', 'val2');
 });
 
-test('wrappers: runs functions as async by passing in a callback as the last argument');
-test('wrappers: runs commands added seperately in series with async option enabled');
-test('wrappers: runs commands added together in parallel with async option enabled');
+test('wrappers: runs functions as async by passing in a callback as the last argument', function (t) {
+  
+  t.plan(4);
+  
+  var wrapperCalled = false;
+  var wrap = wrappers({
+    async: true
+  });
+  
+  wrap.add(function (val1, val2, done) {
+    
+    wrapperCalled = true;
+    
+    t.equal(val1, 'val1', 'passed in value 1');
+    t.equal(val2, 'val2', 'passed in value 2');
+    t.ok(typeof done, 'function', 'passed in callback');
+    
+    done();
+  });
+  
+  wrap.run('val1', 'val2', function (err) {
+    
+    t.notOk(err, 'no error passed');
+  });
+});
+
+test('wrappers: runs commands added seperately in series with async option enabled', function (t) {
+  
+  t.plan(1);
+  
+  var callstack = [];
+  var wrap = wrappers({
+    async: true
+  });
+  
+  wrap
+    .add(function (done) {
+      
+      callstack.push('wrap1');
+      done();
+    })
+    .add(function (done) {
+      
+      callstack.push('wrap2');
+      done();
+    });
+  
+  wrap.run(function () {
+    
+    t.deepEqual(callstack, ['wrap1', 'wrap2']);
+  });
+});
+
+test('wrappers: runs commands added together in parallel with async option enabled', function (t) {
+  
+  var callstack = [];
+  var wrap = wrappers({
+    async: true
+  });
+  
+  wrap
+    .add(function (done) {
+      
+      callstack.push('wrap1');
+      done();
+    })
+    .add(
+      function (done) {
+        
+        process.nextTick(function () {
+          
+          callstack.push('wrap2');
+          done();
+        });
+      },
+      function (done) {
+        
+        callstack.push('wrap3');
+        done();
+      }
+    )
+    .add(function (done) {
+      
+      callstack.push('wrap4');
+      done();
+    });
+  
+  wrap.run(function () {
+    
+    var expectedCallstack = ['wrap1', 'wrap3', 'wrap2', 'wrap4'];
+    
+    t.deepEqual(callstack, expectedCallstack, 'called in series or parallel');
+    t.end();
+  });
+  
+});
