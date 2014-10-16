@@ -11,7 +11,7 @@ test('cli: defaults', function (t) {
   
   t.deepEqual(cli.internals.commands, commands(), 'blank command collection');
   t.deepEqual(cli.internals.flags, flags(), 'blank flag collection');
-  t.deepEqual(cli.internals.beforeAlls, [], 'blank beforeAlls collection');
+  t.deepEqual(cli.internals.beforeAlls.all(), [], 'blank beforeAlls collection');
   t.deepEqual(cli.internals.afterAlls, [], 'blank afterAlls collection');
   t.equal(typeof cli.internals.onInvalidCommand, 'function', 'default on invalid command function');
   t.end();
@@ -135,15 +135,13 @@ test('cli: runs command', function (t) {
   var commandFlagCalled = false;
   var callstack = [];
   
-  cli.beforeAll(function (data, flags, next) {
+  cli.beforeAll(function (data, flags) {
     
     callstack.push('beforeAll');
-    next();
   });
-  cli.afterAll(function (data, flags, next) {
+  cli.afterAll(function (data, flags) {
     
     callstack.push('afterAll');
-    next();
   });
   cli.flag('-t')
     .handler(function () {
@@ -276,14 +274,12 @@ test('cli: runs beforeAlls', function (t) {
   var cli = nash();
   var beforeAllRan = false;
   
-  var chained = cli.beforeAll(function (data, flags, next) {
+  var chained = cli.beforeAll(function (data, flags) {
     
     beforeAllRan = true;
     
     t.deepEqual(data, ['data'], 'passed in data');
     t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
-    
-    next();
   });
   
   cli.runBeforeAlls(['data'], {t: 'flagged'}, function () {
