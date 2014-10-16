@@ -132,6 +132,7 @@ test('cli: runs command', function (t) {
   
   var cli = nash();
   var handlerCalled = false;
+  var commandFlagCalled = false;
   var callstack = [];
   
   cli.beforeAll(function (data, flags, next) {

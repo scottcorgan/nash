@@ -16,7 +16,7 @@ test('command: extends EventEmitter', function (t) {
 test('command: noop', function (t) {
   
   t.doesNotThrow(function () {
-    command.noop()
+    command.noop();
   }, undefined, 'defined function');
   t.deepEqual(typeof command.noop(), 'object', 'blank command');
   
@@ -285,8 +285,8 @@ test('command: deprecated command exits by default', function (t) {
     t.ok(cmd.isDeprecated(), 'deprecated getter');
     t.notOk(handlerCalled, 'handler not called');
     t.notOk(flagCalled, 'flag not called');
-    t.notOk(beforeCalled, 'before not called')
-    t.notOk(afterCalled, 'after not called')
+    t.notOk(beforeCalled, 'before not called');
+    t.notOk(afterCalled, 'after not called');
   });
 });
 

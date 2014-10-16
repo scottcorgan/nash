@@ -38,7 +38,7 @@ test('name: lists name', function (t) {
 
 test('name: matching to given name', function (t) {
   
-  var nm = name('test', 't', 'another')
+  var nm = name('test', 't', 'another');
   
   t.ok(nm.matches('test'), 'matches single name');
   t.ok(nm.matches(['t']), 'matches single name in array');

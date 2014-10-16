@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "npm run lint && tape test/** | tap-spec",
-    "lint": "jshint ./lib/**"
+    "lint": "jshint ./lib/** ./test/**"
   },
   "repository": {
     "type": "git",
