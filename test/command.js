@@ -132,13 +132,12 @@ test('command: runs befores', function (t) {
   var cmd = command('test');
   var beforeCalled = false;
   
-  cmd.before(function (data, flags, next) {
+  cmd.before(function (data, flags) {
     
     beforeCalled = true;
     
     t.deepEqual(data, ['data'], 'passes in data');
     t.deepEqual(flags, {f: true}, 'passes in flags');
-    next();
   });
   
   cmd.runBefores(['data'], {f: true}, function () {
@@ -154,14 +153,12 @@ test('command: runs afters', function (t) {
   var cmd = command('test');
   var afterCalled = false;
   
-  cmd.after(function (data, flags, next) {
+  cmd.after(function (data, flags) {
     
     afterCalled = true;
     
     t.deepEqual(data, ['data'], 'passes in data');
     t.deepEqual(flags, {f: true}, 'passes in flags');
-    
-    next();
   });
   
   cmd.runAfters(['data'], {f: true}, function () {
@@ -217,23 +214,25 @@ test('command: running the command', function (t) {
   var cmd = command('test');
   var callstack = [];
   
-  cmd.before(function (data, flags, next) {
+  cmd.before(function (data, flags) {
+    
     callstack.push('before');
-    next();
   });
   
   cmd.flag('-f')
     .handler(function () {
+      
       callstack.push('flag');
     });
   
   cmd.handler(function () {
+    
     callstack.push('handler');
   });
   
-  cmd.after(function (data, flags, next) {
+  cmd.after(function (data, flags) {
+    
     callstack.push('after');
-    next();
   });
   
   cmd.run([], {
