@@ -3,6 +3,7 @@ var command = require('../lib/command');
 var commands = require('../lib/commands');
 var flags = require('../lib/flags');
 var flag = require('../lib/flag');
+var wrappers = require('../lib/wrappers');
 var test = require('tape');
 
 test('cli: defaults', function (t) {
@@ -11,8 +12,8 @@ test('cli: defaults', function (t) {
   
   t.deepEqual(cli.internals.commands, commands(), 'blank command collection');
   t.deepEqual(cli.internals.flags, flags(), 'blank flag collection');
-  t.deepEqual(cli.internals.beforeAlls.all(), [], 'blank beforeAlls collection');
-  t.deepEqual(cli.internals.afterAlls, [], 'blank afterAlls collection');
+  t.deepEqual(cli.internals.beforeAlls, wrappers(), 'blank beforeAlls collection');
+  t.deepEqual(cli.internals.afterAlls, wrappers(), 'blank afterAlls collection');
   t.equal(typeof cli.internals.onInvalidCommand, 'function', 'default on invalid command function');
   t.end();
 });
@@ -272,19 +273,41 @@ test('cli: runs command task', function (t) {
 test('cli: runs beforeAlls', function (t) {
   
   var cli = nash();
-  var beforeAllRan = false;
+  var beforeAllRan1 = false;
+  var beforeAllRan2 = false;
+  var beforeAllRan3 = false;
   
-  var chained = cli.beforeAll(function (data, flags) {
-    
-    beforeAllRan = true;
-    
-    t.deepEqual(data, ['data'], 'passed in data');
-    t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
-  });
+  var chained = cli
+    .beforeAll(function (data, flags) {
+      
+      beforeAllRan1 = true;
+      
+      t.deepEqual(this, cli, 'bound to cli object');
+      t.deepEqual(data, ['data'], 'passed in data');
+      t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+    })
+    .beforeAll(
+      function (data, flags) {
+        
+        beforeAllRan2 = true;
+        
+        t.deepEqual(data, ['data'], 'passed in data');
+        t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+      },
+      function (data, flags) {
+        
+        beforeAllRan3 = true;
+        
+        t.deepEqual(data, ['data'], 'passed in data');
+        t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+      }
+    );
   
   cli.runBeforeAlls(['data'], {t: 'flagged'}, function () {
     
-    t.ok(beforeAllRan, 'all methods ran');
+    t.ok(beforeAllRan1, 'all methods ran');
+    t.ok(beforeAllRan2, 'all methods ran');
+    t.ok(beforeAllRan3, 'all methods ran');
     t.deepEqual(chained, cli, 'chainable');
     t.end();
   });
@@ -293,21 +316,41 @@ test('cli: runs beforeAlls', function (t) {
 test('cli: runs afterAlls', function (t) {
   
   var cli = nash();
-  var afterAllRan = false;
+  var afterAllRan1 = false;
+  var afterAllRan2 = false;
+  var afterAllRan3 = false;
   
-  var chained = cli.afterAll(function (data, flags, next) {
-    
-    afterAllRan = true;
-    
-    t.deepEqual(data, ['data'], 'passed in data');
-    t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
-    
-    next();
-  });
+  var chained = cli
+    .afterAll(function (data, flags) {
+      
+      afterAllRan1 = true;
+      
+      t.deepEqual(this, cli, 'bound to cli object');
+      t.deepEqual(data, ['data'], 'passed in data');
+      t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+    })
+    .afterAll(
+      function (data, flags) {
+        
+        afterAllRan2 = true;
+        
+        t.deepEqual(data, ['data'], 'passed in data');
+        t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+      },
+      function (data, flags) {
+        
+        afterAllRan3 = true;
+        
+        t.deepEqual(data, ['data'], 'passed in data');
+        t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+      }
+    );
   
   cli.runAfterAlls(['data'], {t: 'flagged'}, function () {
     
-    t.ok(afterAllRan, 'all methods ran');
+    t.ok(afterAllRan1, 'all methods ran');
+    t.ok(afterAllRan2, 'all methods ran');
+    t.ok(afterAllRan3, 'all methods ran');
     t.deepEqual(chained, cli, 'chainable');
     t.end();
   });
