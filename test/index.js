@@ -395,15 +395,13 @@ test('cli: on invalid command', function (t) {
   var cli = nash();
   var commandCalled = false;
   
-  var chain = cli.onInvalidCommand(function (commandName, data, flags, next) {
+  var chain = cli.onInvalidCommand(function (commandName, data, flags) {
     
     commandCalled = true;  
     
     t.equal(commandName, 'noop', 'passes in command name');
     t.deepEqual(data, ['data'], 'passes in data');
     t.deepEqual(flags, {t: 'flagged'}, 'passes in flags');
-    
-    next();
   });
   
   cli.run(['', '', 'noop', 'data', '-t', 'flagged']);

@@ -245,21 +245,6 @@ test('command: running the command', function (t) {
 
 test('command: run command in async mode', function (t) {
   
-  
-  
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // 
-  //   NOTE: this test is breaking for some reason
-  //   Run the tests to see where. Currently working
-  //   on async mode in the command class
-  // 
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  
-  
-  
-  // t.plan(6);
-  
   var handlerCalled = false;
   var cmd = command('test')
     .async()
