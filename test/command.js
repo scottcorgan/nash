@@ -96,7 +96,8 @@ test('command: getters and setters', function (t) {
     .usage('usage')
     .hidden()
     .before(function () {})
-    .after(function () {});
+    .after(function () {})
+    .async();
   
   t.deepEqual(cmd.name(), ['test'], 'name');
   t.equal(cmd.isHidden(), true, 'hidden');
@@ -104,6 +105,7 @@ test('command: getters and setters', function (t) {
   t.equal(cmd.usage(), 'usage', 'usage');
   t.equal(cmd.before().length, 1, 'before');
   t.equal(cmd.after().length, 1, 'after');
+  t.equal(cmd.isAsync(), true, 'async');
   t.end();
 });
 
@@ -140,12 +142,10 @@ test('command: runs befores', function (t) {
     t.deepEqual(flags, {f: true}, 'passes in flags');
   });
   
-  cmd.runBefores(['data'], {f: true}, function () {
-    
-    t.ok(beforeCalled, 'executed in series');
-    t.end();
-  });
+  cmd.runBefores(['data'], {f: true});
   
+  t.ok(beforeCalled, 'executed in series');
+  t.end();
 });
 
 test('command: runs afters', function (t) {
@@ -237,9 +237,60 @@ test('command: running the command', function (t) {
   
   cmd.run([], {
     f: true
-  }, function () {
+  });
+  
+  t.deepEqual(callstack, ['before', 'flag', 'handler', 'after'], 'ran command decorators in order');
+  t.end();
+});
+
+test('command: run command in async mode', function (t) {
+  
+  
+  
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // 
+  //   NOTE: this test is breaking for some reason
+  //   Run the tests to see where. Currently working
+  //   on async mode in the command class
+  // 
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  
+  
+  
+  // t.plan(6);
+  
+  var handlerCalled = false;
+  var cmd = command('test')
+    .async()
+    .handler(function (data1, data2, done) {
+      
+      handlerCalled = true;
+      
+      t.deepEqual(data1, 'data1', 'passed in data1 to command handler');
+      t.deepEqual(data2, 'data2', 'passed in data2 to command handler');
+      t.ok(typeof done, 'function', 'passed in callback to command handler');
+      done();
+    });
+  
+  cmd.before(function (data, flags, done) {
     
-    t.deepEqual(callstack, ['before', 'flag', 'handler', 'after'], 'ran command decorators in order');
+    t.deepEqual(data, ['data1', 'data2'], 'passed in data to before');
+    t.ok(typeof done, 'function', 'passed in callback to before');
+    done();
+  });
+  
+  // cmd.flag('-t')
+  //   .handler(function (val, done) {
+      
+  //     t.equal(val, 'val', 'passed val into flag handler');
+  //     t.ok(typeof done, 'function', 'passed in callback to flag handler');
+  //     done();
+  //   });
+  
+  cmd.run(['data1', 'data2'], {t: 'val'}, function (err) {
+    
+    t.ok(handlerCalled, 'handler called');
     t.end();
   });
 });

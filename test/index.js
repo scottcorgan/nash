@@ -182,6 +182,15 @@ test('cli: runs command', function (t) {
   t.end();
 });
 
+test.skip('cli: runs in async mode', function (t) {
+  
+  var cli = nash({
+    async: true
+  });
+  
+  t.end();
+});
+
 test('cli: command level flags can override cli level flags', function (t) {
   
   var cli = nash();

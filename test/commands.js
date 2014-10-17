@@ -25,7 +25,7 @@ test('commands: instantiates with list of commands', function (t) {
 test('commands: raw array of commands', function (t) {
   
   var cmd = defineCommand('test');
-  var cmds = commands(cmd);
+  var cmds = commands().add(cmd);
   
   t.deepEqual(cmds.all(), [cmd], 'list of commands');
   t.end();
@@ -65,7 +65,7 @@ test('commands: find command by name', function (t) {
   
   var cmd1 = defineCommand('test1', 't1', 'another');
   var cmd2 = defineCommand('test2', 't2');
-  var cmds = commands(cmd1, cmd2);
+  var cmds = commands().add(cmd1, cmd2);
   
   t.deepEqual(cmds.findByName('test1'), cmd1, 'by single name');
   t.deepEqual(cmds.findByName(['test1']), cmd1, 'by single name in array');
@@ -73,4 +73,3 @@ test('commands: find command by name', function (t) {
   t.deepEqual(cmds.findByName('test1', 't1'), cmd1, 'by multiple names as arguments');
   t.end();
 });
-
