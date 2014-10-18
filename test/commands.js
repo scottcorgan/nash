@@ -73,3 +73,16 @@ test('commands: find command by name', function (t) {
   t.deepEqual(cmds.findByName('test1', 't1'), cmd1, 'by multiple names as arguments');
   t.end();
 });
+
+test('commands: set async mode', function (t) {
+  
+  var cmd1 = defineCommand('-t');
+  var cmd2 = defineCommand('-o');
+  var cmds = commands(cmd1, cmd2);
+  
+  cmds.async();
+  
+  t.ok(cmd1.isAsync(), 'set cmd1 to async');
+  t.ok(cmds.isAsync(), 'set async');
+  t.end();
+});

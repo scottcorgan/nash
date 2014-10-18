@@ -265,17 +265,51 @@ test('command: run command in async mode', function (t) {
     done();
   });
   
-  // cmd.flag('-t')
-  //   .handler(function (val, done) {
+  cmd.flag('-t')
+    .handler(function (val, done) {
       
-  //     t.equal(val, 'val', 'passed val into flag handler');
-  //     t.ok(typeof done, 'function', 'passed in callback to flag handler');
-  //     done();
-  //   });
+      t.equal(val, 'val', 'passed val into flag handler');
+      t.ok(typeof done, 'function', 'passed in callback to flag handler');
+      done();
+    });
+  
+  cmd.after(function (data, flags, done) {
+    
+    t.deepEqual(data, ['data1', 'data2'], 'passed in data to after');
+    t.ok(typeof done, 'function', 'passed in callback to after');
+    done();
+  });
   
   cmd.run(['data1', 'data2'], {t: 'val'}, function (err) {
     
     t.ok(handlerCalled, 'handler called');
+    t.end();
+  });
+});
+
+test('command: finishes running command with no handler', function (t) {
+  
+  var beforeCalled = 0;
+  var cmd = command('test')
+    .before(function (data, flags, done) {
+      
+      beforeCalled += 1;
+      
+      if (done) {
+        done();
+      }
+    });
+  
+  // Sync mode
+  cmd.run();
+  
+  // Put in async mode
+  cmd.async();
+  
+  // Async mode
+  cmd.run([], {}, function () {
+    
+    t.equal(beforeCalled, 2, 'called before method twice');
     t.end();
   });
 });

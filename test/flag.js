@@ -36,6 +36,7 @@ test('flag: getters and setters', function (t) {
     .usage('usage')
     .hidden(true)
     .override(true)
+    .async()
     .exit();
   
   t.deepEqual(flg.name(), ['-f'], 'name');
@@ -43,6 +44,7 @@ test('flag: getters and setters', function (t) {
   t.equal(flg.shouldExit(), true, 'hidden');
   t.equal(flg.description(), 'description', 'description');
   t.equal(flg.usage(), 'usage', 'usage');
+  t.equal(flg.isAsync(), true, 'async');
   t.equal(flg.shouldOverride(), true, 'override');
   t.end();
 });
@@ -75,8 +77,25 @@ test('flag: running the flag', function (t) {
   
   t.ok(flagCalled, 'ran flag');
   t.equal(flagCallCount, 1, 'called only once when using runOnce()');
-  t.true(flg.internals.ran, 'flag ran set to true');
+  t.ok(flg.internals.ran, 'flag ran set to true');
   t.end();
+});
+
+test('flag: runs flag in async mode', function (t) {
+  
+  var flg = flag('-t')
+    .async()
+    .handler(function (val, done) {
+      
+      t.equal(val, 'val', 'passed in value');
+      done();
+    });
+  
+  flg.run('val', function () {
+    
+    t.ok(flg.internals.ran, 'flag ran set to true');
+    t.end();
+  });
 });
 
 test('flag: exits process on complete', function (t) {

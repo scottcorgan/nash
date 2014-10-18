@@ -84,3 +84,16 @@ test('flags: adds dashes', function (t) {
   t.equal(flag.addDashes('-t'), '-t', 'add no dashes for a letter with a dash already');
   t.end();
 });
+
+test('flags: set async mode', function (t) {
+  
+  var flg1 = flag('-t');
+  var flg2 = flag('-o');
+  var flgs = flags(flg1, flg2);
+  
+  flgs.async();
+  
+  t.ok(flg1.isAsync(), 'set flag1 to async');
+  t.ok(flgs.isAsync(), 'set async');
+  t.end();
+});
