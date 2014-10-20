@@ -69,7 +69,12 @@ test('commands: find command by name', function (t) {
   
   t.deepEqual(cmds.findByName('test1'), cmd1, 'by single name');
   t.deepEqual(cmds.findByName(['test1']), cmd1, 'by single name in array');
+  
+  // TODO: fix this test. If I change "t1" to "t1s", the test still passes
+  // NOTE: this is probably an issue because when we find a command by name,
+  // it doesn't check both names (_.intersection)
   t.deepEqual(cmds.findByName(['test1', 't1']), cmd1, 'by multiple names in array');
+  
   t.deepEqual(cmds.findByName('test1', 't1'), cmd1, 'by multiple names as arguments');
   t.end();
 });
