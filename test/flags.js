@@ -85,15 +85,42 @@ test('flags: adds dashes', function (t) {
   t.end();
 });
 
-test('flags: set async mode', function (t) {
+test('flags: runs flags', function (t) {
   
-  var flg1 = flag('-t');
-  var flg2 = flag('-o');
+  t.plan(5);
+  
+  var flg1Ran = false;
+  var flg2Ran = false;
+  
+  var flg1 = flag('-t')
+    .handler(function (value) {
+      
+      t.equal(value, 't value', 'passed in value to sync');
+      
+      flg1Ran = true;
+    });
+    
+  var flg2 = flag('--test2')
+  .async()
+  .handler(function (value, done) {
+    
+    t.equal(value, 'test2 value', 'passed in value to async');
+    t.ok(typeof done === 'function', 'passed in callback to async');
+    
+    flg2Ran = true;
+    done();
+  });
+  
   var flgs = flags(flg1, flg2);
   
-  flgs.async();
-  
-  t.ok(flg1.isAsync(), 'set flag1 to async');
-  t.ok(flgs.isAsync(), 'set async');
-  t.end();
+  flgs.run({
+    t: 't value',
+    test2: 'test2 value'
+  }, function (err) {
+    
+    // TODO: test for returning error
+    
+    t.ok(flg1Ran, 'ran flag 1');
+    t.ok(flg2Ran, 'ran flag 2');
+  });
 });

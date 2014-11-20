@@ -79,15 +79,77 @@ test('commands: find command by name', function (t) {
   t.end();
 });
 
-test('commands: set async mode', function (t) {
+test('commands: runs commands sync', function (t) {
   
-  var cmd1 = defineCommand('-t');
-  var cmd2 = defineCommand('-o');
-  var cmds = commands(cmd1, cmd2);
+  t.plan(4);
   
-  cmds.async();
+  var cmdRan = false;
+  var cmdFlagRan = true;
   
-  t.ok(cmd1.isAsync(), 'set cmd1 to async');
-  t.ok(cmds.isAsync(), 'set async');
-  t.end();
+  var cmd = defineCommand('test')
+    .handler(function (value) {
+      
+      t.equal(value, 'data', 'commadn data passed in');
+      
+      cmdRan = true;
+    });
+    
+  cmd.flag('-t')
+    .handler(function (val) {
+      
+      t.equal(val, 't flag', 'flag data passed in ');
+      
+      cmdFlagRan = true;
+    });
+  
+  var cmds = commands(cmd);
+  
+  cmds.run('test', ['data'], {t: 't flag'}, function (err) {
+    
+    t.ok(cmdFlagRan, 'ran command flag');
+    t.ok(cmdRan, 'ran command');
+  });
+});
+
+test('commands: runs commands async', function (t) {
+  
+  t.plan(5);
+  
+  var cmdRan = false;
+  var ranFlag = false;
+  var ranAsyncFlag = false;
+  
+  var cmd = defineCommand('test')
+    .async()
+    .handler(function (value, done) {
+      
+      t.equal(value, 'data', 'passed in data');
+      t.ok(typeof done === 'function', 'passed in callback');
+      
+      cmdRan = true;
+      done();
+    });
+  
+  cmd.flag('-t')
+    .handler(function (val) {
+      
+      ranFlag = true;
+    });
+  
+  cmd.flag('-a')
+    .async()
+    .handler(function (val, done) {
+      
+      ranAsyncFlag = true;
+      done();
+    });
+    
+  var cmds = commands(cmd);
+  
+  cmds.run('test', ['data'], {t: 't flag', a: true}, function (err) {
+    
+    t.ok(ranFlag, 'ran flag');
+    t.ok(ranAsyncFlag, 'ran async flag');
+    t.ok(cmdRan, 'ran command');
+  });
 });

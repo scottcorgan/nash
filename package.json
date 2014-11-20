@@ -37,9 +37,9 @@
     "sorted-object": "^1.0.0"
   },
   "devDependencies": {
-    "jshint": "^2.5.6",
+    "jshint": "^2.5.10",
     "tap-dot": "^0.2.3",
     "tap-spec": "^1.0.0",
-    "tape": "^3.0.1"
+    "tape": "^3.0.3"
   }
 }

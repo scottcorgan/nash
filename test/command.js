@@ -258,27 +258,27 @@ test('command: run command in async mode', function (t) {
       done();
     });
   
-  cmd.before(function (data, flags, done) {
+  // cmd.before(function (data, flags, done) {
     
-    t.deepEqual(data, ['data1', 'data2'], 'passed in data to before');
-    t.ok(typeof done, 'function', 'passed in callback to before');
-    done();
-  });
+  //   t.deepEqual(data, ['data1', 'data2'], 'passed in data to before');
+  //   t.ok(typeof done, 'function', 'passed in callback to before');
+  //   done();
+  // });
   
-  cmd.flag('-t')
-    .handler(function (val, done) {
+  // cmd.flag('-t')
+  //   .handler(function (val, done) {
       
-      t.equal(val, 'val', 'passed val into flag handler');
-      t.ok(typeof done, 'function', 'passed in callback to flag handler');
-      done();
-    });
+  //     t.equal(val, 'val', 'passed val into flag handler');
+  //     t.ok(typeof done, 'function', 'passed in callback to flag handler');
+  //     done();
+  //   });
   
-  cmd.after(function (data, flags, done) {
+  // cmd.after(function (data, flags, done) {
     
-    t.deepEqual(data, ['data1', 'data2'], 'passed in data to after');
-    t.ok(typeof done, 'function', 'passed in callback to after');
-    done();
-  });
+  //   t.deepEqual(data, ['data1', 'data2'], 'passed in data to after');
+  //   t.ok(typeof done, 'function', 'passed in callback to after');
+  //   done();
+  // });
   
   cmd.run(['data1', 'data2'], {t: 'val'}, function (err) {
     
