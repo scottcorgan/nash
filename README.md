@@ -49,11 +49,11 @@ cli.run(process.argv);
 
 #### command(name[, names, ...])
 
-Create a command with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Command`]().
+Create a command with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Command`](#command).
 
 #### flag(name[, names, ...])
 
-Create a flag with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Flag`]().
+Create a flag with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Flag`](#flag).
 
 #### beforeAll(callback[, callback, ...])
 #### afterAll(callback[, callback, ...])
