@@ -490,13 +490,50 @@ test('cli: decorates flags', function (t) {
 
 test('cli: register a plugin', function (t) {
   
-  t.plan(2);
+  t.plan(3);
   
   var cli = nash();
   var commandCalled = false;
   var ranBeforeAll = false;
   
-  var plugin = {
+  var plugin1 = {
+    register: function (cli, options) {
+      
+      cli.beforeAll(function () {
+        
+        ranBeforeAll = true;
+      });
+      
+      cli.command('test')
+        .handler(function () {
+          
+          commandCalled = true;
+        });
+      
+      t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
+    }
+  };
+  
+  cli.register(plugin1, {
+    key: 'value'
+  });
+  
+  cli.run(['', '', 'test']);
+  
+  t.ok(commandCalled, 'ran command from plugin');
+  t.ok(ranBeforeAll, 'ran before all from plugin');
+});
+
+test('cli: registers multiple plugins as an array', function (t) {
+  
+  t.plan(3);
+  
+  var cli = nash();
+  var commandCalled = false;
+  var command2Called = false;
+  var ranBeforeAll = false;
+  
+  var plugin1 = {
     register: function (cli, options) {
       
       cli.beforeAll(function () {
@@ -512,12 +549,73 @@ test('cli: register a plugin', function (t) {
     }
   };
   
-  cli.register(plugin, {
+  var plugin2 = {
+    register: function (cli, options) {
+      
+      cli.command('test2')
+        .handler(function () {
+          
+          command2Called = true;
+        });
+    }
+  };
+  
+  cli.register([plugin1, plugin2], {
     key: 'value'
   });
   
   cli.run(['', '', 'test']);
+  cli.run(['', '', 'test2']);
   
   t.ok(commandCalled, 'ran command from plugin');
   t.ok(ranBeforeAll, 'ran before all from plugin');
+  t.ok(command2Called, 'ran command 2 from plugin');
+});
+
+test('cli: registers multiple plugins as an array', function (t) {
+  
+  t.plan(3);
+  
+  var cli = nash();
+  var commandCalled = false;
+  var command2Called = false;
+  var ranBeforeAll = false;
+  
+  var plugin1 = {
+    register: function (cli, options) {
+      
+      cli.beforeAll(function () {
+        
+        ranBeforeAll = true;
+      });
+      
+      cli.command('test')
+        .handler(function () {
+          
+          commandCalled = true;
+        });
+    }
+  };
+  
+  var plugin2 = {
+    register: function (cli, options) {
+      
+      cli.command('test2')
+        .handler(function () {
+          
+          command2Called = true;
+        });
+    }
+  };
+  
+  cli.register(plugin1, plugin2, {
+    key: 'value'
+  });
+  
+  cli.run(['', '', 'test']);
+  cli.run(['', '', 'test2']);
+  
+  t.ok(commandCalled, 'ran command from plugin');
+  t.ok(ranBeforeAll, 'ran before all from plugin');
+  t.ok(command2Called, 'ran command 2 from plugin');
 });
