@@ -302,7 +302,7 @@ exports.register = function (cli, options) {
 };
 ```
 
-Each plugin must export a `register()1 method. This method is called and given the arguments:
+Each plugin must export a `register()` method. This method is called and given the arguments:
 
 1. cli object
 2. options you pass when registering the plugin
