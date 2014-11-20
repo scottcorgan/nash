@@ -444,3 +444,46 @@ test('cli: on invalid command', function (t) {
   t.deepEqual(chain, cli, 'chainable');
   t.end();
 });
+
+test('cli: decorates commands', function (t) {
+  
+  t.plan(3);
+  
+  var cli = nash();
+  
+  var chained = cli.decorate('command', 'test', function (val) {
+    
+    t.equal(val, 'value', 'passed value in to decorator');
+    
+    return this;
+  });
+  
+  cli.decorate('command', 'another', function () {
+    
+    this._something = 'another';
+  });
+  
+  t.deepEqual(chained, cli, 'chainable');
+  
+  var cmd = cli.command('testing');
+  cmd.test('value');
+  cmd.another();
+  
+  t.equal(cmd._something, 'another', 'can set data on the command');
+});
+
+test('cli: decorates flags', function (t) {
+  
+  t.plan(1);
+  
+  var cli = nash();
+  
+  cli.decorate('flag', 'test', function (val) {
+    
+    t.equal(val, 'data', 'passed data into decorator');
+  });
+  
+  var flg = flag('-t');
+  
+  flg.test('data');
+});
