@@ -104,7 +104,13 @@ test('commands: runs commands sync', function (t) {
   
   var cmds = commands(cmd);
   
-  cmds.run('test', ['data'], {t: 't flag'}, function (err) {
+  cmds.run({
+    name: 'test',
+    data: ['data'],
+    flags: {
+      t: 't flag'
+    }
+  }, function (err) {
     
     t.ok(cmdFlagRan, 'ran command flag');
     t.ok(cmdRan, 'ran command');
@@ -146,7 +152,14 @@ test('commands: runs commands async', function (t) {
     
   var cmds = commands(cmd);
   
-  cmds.run('test', ['data'], {t: 't flag', a: true}, function (err) {
+  cmds.run({
+    name:'test',
+    data: ['data'],
+    flags: {
+      t: 't flag',
+      a: true
+    }
+  }, function (err) {
     
     t.ok(ranFlag, 'ran flag');
     t.ok(ranAsyncFlag, 'ran async flag');
