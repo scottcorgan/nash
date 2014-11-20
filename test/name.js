@@ -1,14 +1,6 @@
 var name = require('../lib/name');
 var test = require('tape');
 
-test('name: instance', function (t) {
-  
-  var nm = name('test');
-  
-  t.ok(nm instanceof name.Instance, 'instance of Name');
-  t.end();
-});
-
 test('name: adds names', function (t) {
   
   t.deepEqual(name().add('test').all(), ['test'], 'add single name');
