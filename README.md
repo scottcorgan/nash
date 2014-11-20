@@ -2,6 +2,33 @@
 
 Command-line masterpieces
 
+**API**
+
+* [Cli](#cli)
+  * [command]()
+  * [flag]()
+  * [beforeAll]()
+  * [afterAll]()
+  * [onInvalidCommand]()
+  * [register]()
+* [Command]()
+  * [handler]()
+  * [task]()
+  * [flag]()
+  * [async]()
+  * [before]()
+  * [after]()
+  * [name]()
+  * [deprecate]()
+  * [deprecateShouldExit]()
+* [Flag]()
+  * [handler]()
+  * [exit]()
+  * [async]()
+  * [override]()
+  * [name]()
+* [Plugins]()
+
 ## Install
 
 ```
@@ -139,7 +166,7 @@ Running `cli.command('name')` creates an instance of the Command class with foll
 
 ### handler(callback)
 
-The callback gets executed when the command is called. Any values passed in to the run method on the cli get passed into the callback. If the command is in async mode, the last parameter passed to the callback is the function to call when you're done in the callback.
+The callback gets executed when the command is called. Any values passed in to the run method on the cli get passed into the callback. If the command is in async mode, the last parameter passed to the callback is the function to call when you're done.
 
 ```js
 var nash = require('nash');
@@ -222,7 +249,7 @@ cli.run(['', '', 'command']);
 
 ### before(callback[, callback, ...])
 
-Add a function or functions to be called before the command and the command's flags are run. This has the same callback signature as Cli's `beforeAll()`
+Add a function or functions to be called before the command and the command's flags are run. This has the same callback signature as Cli's [`beforeAll()`](#beforeallcallback-callback-)
 
 ### after(callback[, callback, ...])
 
@@ -268,10 +295,84 @@ If no value or a value of `true` is passed in, the command won't run and the pro
 Running `cli.flag('name')` or `cli.command('name').flag('name')` creates an instance of the Flag class. If created under a command, the flag only runs with that command. The Flag class has the following methods available:
 
 ### handler(callback)
+
+The callback gets executed when the flag is called. Any values passed in to the run method on the cli get passed into the callback. If the flag is in async mode, the last parameter passed to the callback is the function to call when you're done.
+
+```js
+var nash = require('nash');
+var cli = nash();
+
+
+// Sync mode
+cli.command('some-command')
+  .flag('-f')
+  .handler(function () {
+  
+  	// Do something here
+  });
+
+// Async mode
+cli.command('async-command')
+	.flag('-f')
+  .async()
+  .handler(function (done) {
+  
+  	// Do something here
+    done();
+  });
+
+
+// Usually passed process.argv
+cli.run(['', '', 'some-command', '-f']);
+
+```
+
 ### exit()
+
+If no value or a value of `true` is passed in, the program will exit after the flag runs.
+
 ### async()
+
+If no value or a value of `true` is passed in, the flag will be set to async mode and will receive a callback as the last paraemter to be called when done.
+
 ### override()
+
+If no value or a value of `true` is passed in, this command specific flag will override the cli/global flag. If set to `false` or not called, the flag will run in series after the cli/global flag.
+
+```js
+var nash = require('nash');
+var cli = nash();
+
+
+cli.flag('-f')
+	.handler(function () {
+  
+  });
+
+cli.command('some-command')
+	.flag('-f')
+  .override()
+  .handler(function () {
+  
+  	// Only this flag runs for -f
+  });
+  
+cli.run(['', '', 'some-command', '-f']);
+```
+
 ### name(name[, name, ...])
+
+Add more names to the flag. Helpful if you want aliases or mispellings to trigger the flag.
+
+
+```js
+var nash = require('nash');
+var cli = nash();
+
+cli.command('command')
+	.flag('-f')
+	  .name('--flag', '--faggling');
+```
 
 ## Plugins
 
