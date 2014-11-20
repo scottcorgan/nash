@@ -487,3 +487,37 @@ test('cli: decorates flags', function (t) {
   
   flg.test('data');
 });
+
+test('cli: register a plugin', function (t) {
+  
+  t.plan(2);
+  
+  var cli = nash();
+  var commandCalled = false;
+  var ranBeforeAll = false;
+  
+  var plugin = {
+    register: function (cli, options) {
+      
+      cli.beforeAll(function () {
+        
+        ranBeforeAll = true;
+      });
+      
+      cli.command('test')
+        .handler(function () {
+          
+          commandCalled = true;
+        });
+    }
+  };
+  
+  cli.register(plugin, {
+    key: 'value'
+  });
+  
+  cli.run(['', '', 'test']);
+  
+  t.ok(commandCalled, 'ran command from plugin');
+  t.ok(ranBeforeAll, 'ran before all from plugin');
+});
