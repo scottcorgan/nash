@@ -55,11 +55,11 @@ Create a command with the given name(s). Supports a single name, and array of na
 
 Create a flag with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Flag`]().
 
-### beforeAll(callback[, callback, ...])
-### afterAll(callback[, callback, ...])
-### onInvalidCommand(callback)
-### runFlag(name, data[, callback])
-### register()
+#### beforeAll(callback[, callback, ...])
+#### afterAll(callback[, callback, ...])
+#### onInvalidCommand(callback)
+#### runFlag(name, data[, callback])
+#### register()
 
 ### Command
 
