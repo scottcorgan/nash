@@ -11,24 +11,56 @@ npm install nash --save
 ## Usage
 
 ```js
-var Nash = require('nash');
-var cli = Nash.createCli({
-  title: 'My CLI',
-  description: 'My CLI description, cool!'
+var nash = require('nash');
+var cli = nash();
+
+cli.beforeAll(function () {
+  
+  // Run this before all commands
 });
 
 cli.flag('-p')
-  .description('this does something');
+  .handler(function () {
+    
+    // Do something when this flag is triggered
+  });
 
 cli.command('list')
-  .before(function (command, done) {
-    // Do something before
-    done();
-  })
-  .handler(function (done) {
+  .handler(function () {
+    
     // Do something here
+  });
+
+cli.command('async-command')
+  .async()
+  .handler(function (data, done) {
+    
+    // If do some async stuff;
+    
     done();
   });
 
 cli.run(process.argv);
 ```
+
+## Api
+
+### Cli
+
+#### command(name[, names, ...])
+
+Create a command with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Command`]().
+
+#### flag(name[, names, ...])
+
+Create a flag with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Flag`]().
+
+### beforeAll(callback[, callback, ...])
+### afterAll(callback[, callback, ...])
+### onInvalidCommand(callback)
+### runFlag(name, data[, callback])
+### register()
+
+### Command
+
+### Flag
