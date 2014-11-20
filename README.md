@@ -1,33 +1,33 @@
 # nash [ ![Codeship Status for scottcorgan/nash](https://codeship.com/projects/63cd73f0-528e-0132-350c-1e034fd16c6e/status)](https://codeship.com/projects/48678)
 
-Command-line masterpieces
+Craft command-line masterpieces
 
 **API**
 
 * [Cli](#cli)
-  * [command]()
-  * [flag]()
-  * [beforeAll]()
-  * [afterAll]()
-  * [onInvalidCommand]()
-  * [register]()
-* [Command]()
-  * [handler]()
-  * [task]()
-  * [flag]()
-  * [async]()
-  * [before]()
-  * [after]()
-  * [name]()
-  * [deprecate]()
-  * [deprecateShouldExit]()
-* [Flag]()
-  * [handler]()
-  * [exit]()
-  * [async]()
-  * [override]()
-  * [name]()
-* [Plugins]()
+  * [command](#commandname-names-)
+  * [flag](#flagname-names-)
+  * [beforeAll](#beforeallcallback-callback-)
+  * [afterAll](#afterallcallback-callback-)
+  * [onInvalidCommand](#oninvalidcommandcallback)
+  * [register](#registerplugin-options)
+* [Command](#command)
+  * [handler](#handlercallback)
+  * [task](#taskname-name-)
+  * [flag](#flagname-name-)
+  * [async](#async)
+  * [before](#beforecallback-callback-)
+  * [after](#aftercallback-callback-)
+  * [name](#namename-name-)
+  * [deprecate](#deprecatemessage)
+  * [deprecateShouldExit](#deprecatedshouldexit)
+* [Flag](#flag)
+  * [handler](#handlercallback-1)
+  * [exit](#exit)
+  * [async](#async-1)
+  * [override](#override)
+  * [name](#namename-name--1)
+* [Plugins](#plugins)
 
 ## Install
 
@@ -376,7 +376,7 @@ cli.command('command')
 
 ## Plugins
 
-Nash lets you register plugins via the [`register`](#register) method on the cli object. This makes it easier to break up your command-line app as it grows.
+Nash lets you register plugins via the [`register`](#registerplugin-options) method on the cli object. This makes it easier to break up your command-line app as it grows.
 
 **Example of registering a plugin:**
 
