@@ -1,6 +1,4 @@
-# nash
-
-**(Readme Incomplete)**
+# nash [ ![Codeship Status for scottcorgan/nash](https://codeship.com/projects/63cd73f0-528e-0132-350c-1e034fd16c6e/status)](https://codeship.com/projects/48678)
 
 Command-line masterpieces
 

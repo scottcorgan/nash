@@ -1,10 +1,11 @@
 {
   "name": "nash",
-  "version": "0.5.2",
-  "description": "Command-line masterpieces",
-  "main": "index.js",
+  "version": "1.0.0",
+  "description": "Craft Command-line Masterpieces",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run lint && tape test/** | tap-spec",
+    "lint": "jshint ./lib/** ./test/**"
   },
   "repository": {
     "type": "git",
@@ -24,15 +25,21 @@
   },
   "homepage": "https://github.com/scottcorgan/nash",
   "dependencies": {
-    "lodash": "~2.4.1",
-    "minimist": "^0.1.0",
+    "as-array": "^1.0.0",
+    "async": "^0.9.0",
+    "chalk": "^0.5.1",
+    "exclude": "^1.0.0",
     "feedback": "~0.3.2",
-    "pretty-print": "0.4.x",
-    "args-list": "~0.3.1",
-    "drainer": "~0.2.1",
-    "chalk": "~0.4.0",
-    "sorted-object": "~1.0.0",
-    "qmap": "0.2.x",
-    "flat-arguments": "0.3.x"
+    "flat-arguments": "^1.0.0",
+    "lodash": "^2.4.1",
+    "minimist": "^1.1.0",
+    "pretty-print": "^1.0.0",
+    "sorted-object": "^1.0.0"
+  },
+  "devDependencies": {
+    "jshint": "^2.5.10",
+    "tap-dot": "^0.2.3",
+    "tap-spec": "^1.0.0",
+    "tape": "^3.0.3"
   }
 }
