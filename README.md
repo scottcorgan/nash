@@ -1,4 +1,5 @@
 # nash [ ![Codeship Status for scottcorgan/nash](https://codeship.com/projects/63cd73f0-528e-0132-350c-1e034fd16c6e/status)](https://codeship.com/projects/48678)
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/scottcorgan/nash?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Craft command-line masterpieces
 
