@@ -72,6 +72,23 @@ cli.run(process.argv);
 
 ## Cli
 
+### run(argv)
+
+Run the cli app with the given arguments. Normally you'd pass in `process.argv`.
+
+```js
+var nash = require('nash');
+var cli = nash();
+
+cli.command('some-command')
+  .handler(function () {
+  
+		console.log('Some Command');
+  });
+  
+cli.run(process.argv);
+```
+
 ### command(name[, names, ...])
 
 Create a command with the given name(s). Supports a single name, and array of names, or multiple names separated by commas as arguments to the command method. Returns an instance of [`Command`](#command).
