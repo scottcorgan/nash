@@ -118,7 +118,50 @@ test('cli: runs flags', function (t) {
     // Flag override values
     [overrideFlag]
   );
+});
+
+test('cli: runs a single flag in sync mode', function (t) {
   
+  t.plan(3);
+  
+  var cli = nash();
+  var ranFlag = false;
+  
+  cli.flag('-t')
+    .handler(function (data) {
+      
+      t.equal(data, 'data', 'passed data into flag');
+      
+      ranFlag = true;
+    });
+  
+  var chained = cli.runFlag('t', 'data');
+  
+  t.deepEqual(chained, cli, 'is chainable');
+  t.ok(ranFlag, 'ran flag');
+});
+
+test('cli: runs a single flag in async mode', function (t) {
+  
+  t.plan(2);
+  
+  var cli = nash();
+  var ranFlag = false;
+  
+  cli.flag('-t')
+    .async()
+    .handler(function (data, done) {
+      
+      t.equal(data, 'data', 'passed data into flag');
+      
+      ranFlag = true;
+      done();
+    });
+  
+  cli.runFlag('t', 'data', function () {
+    
+    t.ok(ranFlag, 'ran flag');
+  });
 });
 
 test('cli: run method is chainable', function (t) {
