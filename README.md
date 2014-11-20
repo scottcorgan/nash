@@ -5,6 +5,7 @@ Craft command-line masterpieces
 **API**
 
 * [Cli](#cli)
+  * [run](#runargv)
   * [command](#commandname-names-)
   * [flag](#flagname-names-)
   * [beforeAll](#beforeallcallback-callback-)
