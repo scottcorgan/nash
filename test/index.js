@@ -14,7 +14,6 @@ test('cli: defaults', function (t) {
   t.deepEqual(cli.internals.flags, flags(), 'blank flag collection');
   t.deepEqual(cli.internals.beforeAlls, wrappers(), 'blank beforeAlls collection');
   t.deepEqual(cli.internals.afterAlls, wrappers(), 'blank afterAlls collection');
-  t.equal(typeof cli.internals.onInvalidCommand, 'function', 'default on invalid command function');
   t.end();
 });
 
@@ -442,6 +441,23 @@ test('cli: on invalid command', function (t) {
   
   t.ok(commandCalled, 'ran');
   t.deepEqual(chain, cli, 'chainable');
+  t.end();
+});
+
+test('cli: default command', function (t) {
+  
+  var cli = nash();
+  var commandCalled = false;
+  
+  var chain = cli.defaultCommand(function (data, flags) {
+    
+    commandCalled = true;  
+  });
+  
+  cli.run(['', '']);
+  
+  t.ok(commandCalled, 'ran command');
+  t.deepEqual(chain, cli, 'command is chainable');
   t.end();
 });
 

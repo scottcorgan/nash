@@ -10,6 +10,7 @@ Craft command-line masterpieces
   * [flag](#flagname-names-)
   * [beforeAll](#beforeallcallback-callback-)
   * [afterAll](#afterallcallback-callback-)
+  * [defaultCommand](#defaultcommandcallback)
   * [onInvalidCommand](#oninvalidcommandcallback)
   * [register](#registerplugin-options)
 * [Command](#command)
@@ -151,6 +152,24 @@ cli.run(['', '', 'some-command', 'value', '-f', 'flag-value']);
 ### afterAll(callback[, callback, ...])
 
 Does the same thing as `beforeAll()`, except runs the callbacks after all the commands and flags are run.
+
+### defaultCommand(callback)
+
+Declare a default command to run if no command is provided. This is useful for small cli apps that have no commands and do only one task. The callback gets the following parameters:
+
+* `flags` - a key/value map of flags and their corresponding values
+
+```js
+var nash = require('nash');
+var cli = nash();
+
+cli.defaultCommand(function (flags) {
+	
+  // Do stuff here
+});
+
+cli.run([]);
+```
 
 ### onInvalidCommand(callback)
 
