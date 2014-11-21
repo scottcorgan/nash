@@ -1,6 +1,6 @@
 {
   "name": "nash",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Craft command-line Masterpieces",
   "main": "lib/index.js",
   "scripts": {
@@ -41,7 +41,7 @@
   "devDependencies": {
     "jshint": "^2.5.10",
     "tap-dot": "^0.2.3",
-    "tap-spec": "^2.0.1",
+    "tap-spec": "^2.1.0",
     "tape": "^3.0.3"
   }
 }
