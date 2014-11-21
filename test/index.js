@@ -447,17 +447,20 @@ test('cli: on invalid command', function (t) {
 test('cli: default command', function (t) {
   
   var cli = nash();
-  var commandCalled = false;
+  var commandCalledCount = 0;
   
-  var chain = cli.defaultCommand(function (data, flags) {
-    
-    commandCalled = true;  
-  });
+  cli.default()
+    .handler(function () {
+      
+      commandCalledCount += 1;
+    });
+  cli.run();
+  t.equal(commandCalledCount, 1, 'command ran first time');
   
-  cli.run(['', '']);
+  var defaultCommand = cli.default();
+  cli.run();
+  t.equal(commandCalledCount, 2, 'ran same default command');
   
-  t.ok(commandCalled, 'ran command');
-  t.deepEqual(chain, cli, 'command is chainable');
   t.end();
 });
 
