@@ -7,7 +7,7 @@ Craft command-line masterpieces
 * [Cli](#cli)
   * [run](#runargv)
   * [command](#commandname-names-)
-  * [default]()
+  * [default](#defaultcallback)
   * [flag](#flagname-names-)
   * [beforeAll](#beforeallcallback-callback-)
   * [afterAll](#afterallcallback-callback-)
