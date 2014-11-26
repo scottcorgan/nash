@@ -249,7 +249,7 @@ cli.run(['', '', 'command:task']);
 
 ### flag(name[, name, ...])
 
-Creats a command-specific flag that only runs for that command. Returns an instance of [`Flag`](#flag).
+Creates a command-specific flag that only runs for that command. Returns an instance of [`Flag`](#flag).
 
 ```js
 var nash = require('nash');
@@ -386,7 +386,7 @@ cli.flag('-f')
   });
 
 cli.command('some-command')
-	.flag('-f')
+  .flag('-f')
   .override()
   .handler(function () {
   
@@ -407,7 +407,7 @@ var cli = nash();
 
 cli.command('command')
 	.flag('-f')
-	  .name('--flag', '--faggling');
+	  .name('--flag', '--flaggling');
 ```
 
 ## Plugins
