@@ -451,3 +451,7 @@ Each plugin must export a `register()` method. This method is called and given t
 npm install
 npm test
 ```
+
+## License
+
+[MIT](https://github.com/scottcorgan/nash/blob/master/LICENSE)
