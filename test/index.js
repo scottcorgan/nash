@@ -464,6 +464,31 @@ test('cli: default command', function (t) {
   t.end();
 });
 
+test('cli: global flags work with default command', function (t) {
+  
+  var cli = nash();
+  var commandCalled = false;
+  var flagCalled = false;
+  
+  cli.flag('-t')
+    .handler(function () {
+      
+      flagCalled = true;
+    });
+  
+  cli.default()
+    .handler(function () {
+      
+      commandCalled = true;
+    });
+    
+  cli.run(['', '', '-t']);
+  t.ok(commandCalled, 'command ran');
+  t.ok(flagCalled, 'flag ran');
+  
+  t.end();
+});
+
 test('cli: decorates commands', function (t) {
   
   t.plan(3);
