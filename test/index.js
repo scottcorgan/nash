@@ -464,6 +464,21 @@ test('cli: default command', function (t) {
   t.end();
 });
 
+test('cli: all arguments get passed to default command', function (t) {
+  
+  var cli = nash();
+  
+  cli.default()
+    .handler(function (arg1, arg2) {
+      
+      t.equal(arg1, 'arg1', 'argument 1 passed');
+      t.equal(arg2, 'arg2', 'argument 2 passed');
+    });
+  cli.run(['', '', 'arg1', 'arg2']);
+  
+  t.end();
+});
+
 test('cli: global flags work with default command', function (t) {
   
   var cli = nash();
