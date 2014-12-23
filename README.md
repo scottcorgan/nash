@@ -12,6 +12,8 @@ Craft command-line masterpieces
   * [beforeAll](#beforeallcallback-callback-)
   * [afterAll](#afterallcallback-callback-)
   * [onInvalidCommand](#oninvalidcommandcallback)
+  * [set](#setname-value)
+  * [get](#getname)
   * [register](#registerplugin-options)
 * [Command](#command)
   * [handler](#handlercallback)
@@ -191,6 +193,19 @@ cli.onInvalidCommand(function (commandName, data, flags) {
 // This is usually sent in via process.argv
 cli.run(['', '', 'some-command', 'value', '-f', 'flag-value']);
 ```
+
+### set(name, value)
+
+Cli-level/app-level settings. Set the given `name` to the given `value
+
+* `name` - name of key
+* `value` - value of name
+
+### get(name)
+
+Cli-level/app-level getter for settings.
+
+* `name` - name of key to get
 
 ### register(plugin[, options])
 
