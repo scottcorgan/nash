@@ -709,3 +709,17 @@ test('cli: registers multiple plugins as an array', function (t) {
   t.ok(ranBeforeAll, 'ran before all from plugin');
   t.ok(command2Called, 'ran command 2 from plugin');
 });
+
+test('cli: getters/setters', function (t) {
+  
+  var cli = nash();
+  
+  t.ok(typeof cli.set === 'function', 'setter exists');
+  
+  cli.set('key', 'value');
+  
+  t.ok(typeof cli.get === 'function', 'getter exists');
+  t.equal(cli.get('key'), 'value', 'getter');
+  
+  t.end();
+});
