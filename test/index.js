@@ -583,6 +583,37 @@ test('cli: register a plugin', function (t) {
   t.ok(ranBeforeAll, 'ran before all from plugin');
 });
 
+test('cli: registers plugin with no options', function (t) {
+  
+  var cli = nash();
+  var commandCalled = false;
+  var ranBeforeAll = false;
+  
+  var plugin1 = {
+    register: function (cli, options) {
+      
+      cli.beforeAll(function () {
+        
+        ranBeforeAll = true;
+      });
+      
+      cli.command('test')
+        .handler(function () {
+          
+          commandCalled = true;
+        });
+    }
+  };
+  
+  cli.register(plugin1, {test: 'me'});
+  
+  cli.run(['', '', 'test']);
+  
+  t.ok(commandCalled, 'ran command from plugin');
+  t.ok(ranBeforeAll, 'ran before all from plugin');
+  t.end();
+});
+
 test('cli: registers multiple plugins as an array', function (t) {
   
   t.plan(3);
