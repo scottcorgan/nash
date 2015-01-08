@@ -485,7 +485,7 @@ test('cli: global flags work with default command', function (t) {
   var commandCalled = false;
   var flagCalled = false;
   
-  cli.flag('-t')
+  cli.flag('--help', '-h')
     .handler(function () {
       
       flagCalled = true;
@@ -497,7 +497,7 @@ test('cli: global flags work with default command', function (t) {
       commandCalled = true;
     });
     
-  cli.run(['', '', '-t']);
+  cli.run(['', '', '-h']);
   t.ok(commandCalled, 'command ran');
   t.ok(flagCalled, 'flag ran');
   
