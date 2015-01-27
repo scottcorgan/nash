@@ -1,5 +1,6 @@
-var wrappers = require('../lib/wrappers');
 var test = require('tape');
+
+var wrappers = require('../lib/wrappers');
 
 test('wrappers: instance', function (t) {
   

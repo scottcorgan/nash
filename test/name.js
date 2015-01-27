@@ -1,5 +1,6 @@
-var name = require('../lib/name');
 var test = require('tape');
+
+var name = require('../lib/name');
 
 test('name: adds names', function (t) {
   

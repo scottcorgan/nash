@@ -1,6 +1,7 @@
+var test = require('tape');
+
 var commands = require('../lib/commands');
 var defineCommand = require('../lib/command');
-var test = require('tape');
 
 test('commands: instance', function (t) {
   

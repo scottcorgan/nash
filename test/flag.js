@@ -1,5 +1,6 @@
-var flag = require('../lib/flag');
 var test = require('tape');
+
+var flag = require('../lib/flag');
 
 test('flag: extends EventEmitter', function (t) {
   

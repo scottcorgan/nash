@@ -1,10 +1,11 @@
+var test = require('tape');
+
 var nash = require('../lib/index');
 var command = require('../lib/command');
 var commands = require('../lib/commands');
 var flags = require('../lib/flags');
 var flag = require('../lib/flag');
 var wrappers = require('../lib/wrappers');
-var test = require('tape');
 
 test('cli: defaults', function (t) {
   

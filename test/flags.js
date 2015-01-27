@@ -1,6 +1,7 @@
+var test = require('tape');
+
 var flags = require('../lib/flags');
 var flag = require('../lib/flag');
-var test = require('tape');
 
 test('flags: instance', function (t) {
   

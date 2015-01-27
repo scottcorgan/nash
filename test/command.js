@@ -1,5 +1,6 @@
-var command = require('../lib/command');
 var test = require('tape');
+
+var command = require('../lib/command');
 
 test('command: extends EventEmitter', function (t) {
   
