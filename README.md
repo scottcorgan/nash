@@ -22,8 +22,6 @@ Craft command-line masterpieces
   * [before](#beforecallback-callback-)
   * [after](#aftercallback-callback-)
   * [name](#namename-name-)
-  * [deprecate](#deprecatemessage)
-  * [deprecateShouldExit](#deprecatedshouldexit)
 * [Flag](#flag)
   * [handler](#handlercallback-1)
   * [exit](#exit)
@@ -295,28 +293,6 @@ var cli = nash();
 cli.command('command')
   .name('cmd', 'commnd')
 ```
-
-### deprecate(message)
-
-Sets a command as deprecated. Pass in a message and the cli emits an event `warning` with the message.
-
-```js
-var nash = require('nash');
-var cli = nash();
-
-cli.command('command')
-  .deprecate('Do not use this anymore');
-
-cli.on('warning', function (msg) {
-	console.log('Warning: ' + msg);
-});
-
-cli.run(['', '', 'command']);
-```
-
-### deprecatedShouldExit()
-
-If no value or a value of `true` is passed in, the command won't run and the program will exit after it emits the deprecation warning.
 
 ## Flag
 
