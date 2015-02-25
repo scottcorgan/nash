@@ -11,7 +11,6 @@ Craft command-line masterpieces
   * [flag](#flagname-names-)
   * [beforeAll](#beforeallcallback-callback-)
   * [afterAll](#afterallcallback-callback-)
-  * [onInvalidCommand](#oninvalidcommandcallback)
   * [set](#setname-value)
   * [get](#getname)
   * [register](#registerplugin-options)
@@ -171,28 +170,6 @@ cli.run(['', '', 'some-command', 'value', '-f', 'flag-value']);
 ### afterAll(callback[, callback, ...])
 
 Does the same thing as `beforeAll()`, except runs the callbacks after all the commands and flags are run.
-
-### onInvalidCommand(callback)
-
-Callback gets called if no matching commands are found. This is useful to show error or help messages, and also to provide a catch-all command. The callback receives 3 parameters
-
-* `commandName` - the name of the command that was attemped
-* `data` - values passed in with the command
-* `flags` - a key/value map of flags and their corresponding values
-
-```js
-var nash = require('nash');
-var cli = nash();
-
-cli.onInvalidCommand(function (commandName, data, flags) {
-
-	// data === ['value']
-  // flags === {f: 'flag-value'}
-});
-
-// This is usually sent in via process.argv
-cli.run(['', '', 'some-command', 'value', '-f', 'flag-value']);
-```
 
 ### set(name, value)
 

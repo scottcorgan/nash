@@ -424,27 +424,6 @@ test('cli: finds a command task', function (t) {
   t.end();
 });
 
-test('cli: on invalid command', function (t) {
-  
-  var cli = nash();
-  var commandCalled = false;
-  
-  var chain = cli.onInvalidCommand(function (commandName, data, flags) {
-    
-    commandCalled = true;  
-    
-    t.equal(commandName, 'noop', 'passes in command name');
-    t.deepEqual(data, ['data'], 'passes in data');
-    t.deepEqual(flags, {t: 'flagged'}, 'passes in flags');
-  });
-  
-  cli.run(['', '', 'noop', 'data', '-t', 'flagged']);
-  
-  t.ok(commandCalled, 'ran');
-  t.deepEqual(chain, cli, 'chainable');
-  t.end();
-});
-
 test('cli: default command', function (t) {
   
   var cli = nash();
