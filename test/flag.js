@@ -37,12 +37,10 @@ test('flag: getters and setters', function (t) {
     .usage('usage')
     .hidden(true)
     .override(true)
-    .async()
-    .exit();
+    .async();
   
   t.deepEqual(flg.name(), ['-f'], 'name');
   t.equal(flg.isHidden(), true, 'hidden');
-  t.equal(flg.shouldExit(), true, 'hidden');
   t.equal(flg.description(), 'description', 'description');
   t.equal(flg.usage(), 'usage', 'usage');
   t.equal(flg.isAsync(), true, 'async');
@@ -97,22 +95,4 @@ test('flag: runs flag in async mode', function (t) {
     t.ok(flg.internals.ran, 'flag ran set to true');
     t.end();
   });
-});
-
-test('flag: exits process on complete', function (t) {
-  
-  var exitedProcess = false;
-  var flg = flag('-t');
-  
-  flg._exitProcess = function () {
-    
-    exitedProcess = true;
-  };
-  
-  flg
-    .exit()
-    .run();
-  
-  t.ok(exitedProcess, 'exited process');
-  t.end();
 });

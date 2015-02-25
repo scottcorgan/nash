@@ -24,7 +24,6 @@ Craft command-line masterpieces
   * [name](#namename-name-)
 * [Flag](#flag)
   * [handler](#handlercallback-1)
-  * [exit](#exit)
   * [async](#async-1)
   * [override](#override)
   * [name](#namename-name--1)
@@ -330,10 +329,6 @@ cli.command('async-command')
 cli.run(['', '', 'some-command', '-f']);
 
 ```
-
-### exit()
-
-If no value or a value of `true` is passed in, the program will exit after the flag runs.
 
 ### async()
 

@@ -75,7 +75,7 @@ test('wrappers: runs all the wrapper functions', function (t) {
   t.end();
 });
 
-test('wrapprs: runs wrapper functions with given values passed into functions', function (t) {
+test('wrappers: runs wrapper functions with given values passed into functions', function (t) {
   
   t.plan(2);  
   
