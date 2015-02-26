@@ -22,32 +22,27 @@ test('flag: handler', function (t) {
   
   var handlerCalled = false;
   var flg = flag('test')
-    .handler(function () {
+    .handler(function (done) {
       
       handlerCalled = true;
+      
+      done();
     });
   
-  flg.handler()();
-  
-  t.equal(typeof flg.handler(), 'function', 'gets function');
-  t.ok(handlerCalled, 'sets the function');
-  t.end();
+  flg.handler()(function () {
+    
+    t.equal(typeof flg.handler(), 'function', 'gets function');
+    t.ok(handlerCalled, 'sets the function');
+    t.end();
+  });
 });
 
 test('flag: getters and setters', function (t) {
   
   var flg = flag('-f')
-    .description('description')
-    .usage('usage')
-    .hidden(true)
-    .override(true)
-    .async();
+    .override(true);
   
   t.deepEqual(flg.name(), ['-f'], 'name');
-  t.equal(flg.isHidden(), true, 'hidden');
-  t.equal(flg.description(), 'description', 'description');
-  t.equal(flg.usage(), 'usage', 'usage');
-  t.equal(flg.isAsync(), true, 'async');
   t.equal(flg.shouldOverride(), true, 'override');
   t.end();
 });
@@ -67,36 +62,24 @@ test('flag: running the flag', function (t) {
   var flagCalled = false;
   var flagCallCount = 0;
   var flg = flag('-t')
-    .handler(function (data) {
+    .handler(function (data, done) {
       
       flagCalled = true;
       flagCallCount += 1;
       
       t.equal(data, 'data', 'flag value');
-    });
-  
-  flg.run('data');
-  flg.runOnce('data');
-  
-  t.ok(flagCalled, 'ran flag');
-  t.equal(flagCallCount, 1, 'called only once when using runOnce()');
-  t.ok(flg.internals.ran, 'flag ran set to true');
-  t.end();
-});
-
-test('flag: runs flag in async mode', function (t) {
-  
-  var flg = flag('-t')
-    .async()
-    .handler(function (val, done) {
       
-      t.equal(val, 'val', 'passed in value');
       done();
     });
   
-  flg.run('val', function () {
+  flg.run('data', function () {
     
-    t.ok(flg.internals.ran, 'flag ran set to true');
-    t.end();
+    flg.runOnce('data', function () {
+      
+      t.ok(flagCalled, 'ran flag');
+      t.equal(flagCallCount, 1, 'called only once when using runOnce()');
+      t.ok(flg.internals.ran, 'flag ran set to true');
+      t.end();
+    });
   });
 });
