@@ -35,10 +35,14 @@ test('cli: extends EventEmitter', function (t) {
   var EventEmitter = require('events').EventEmitter;
   var cli = nash();
   
-  Object.keys(EventEmitter.prototype).forEach(function (key) {
-    
-    t.ok(cli[key], 'instance has EventEmitter value: ' + key);
-  });
+  t.ok(cli.emit, 'emit');
+  t.ok(cli.addListener, 'addListener');
+  t.ok(cli.on, 'on');
+  t.ok(cli.once, 'once');
+  t.ok(cli.removeListener, 'removeListener');
+  t.ok(cli.removeAllListeners, 'removeAllListeners');
+  t.ok(cli.listeners, 'listeners');
+  
   t.end();
 });
 

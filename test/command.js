@@ -7,10 +7,14 @@ test('command: extends EventEmitter', function (t) {
   var EventEmitter = require('events').EventEmitter;
   var cmd = command('test');
   
-  Object.keys(EventEmitter.prototype).forEach(function (key) {
-    
-    t.ok(cmd[key], 'instance has EventEmitter value: ' + key);
-  });
+  t.ok(cmd.emit, 'emit');
+  t.ok(cmd.addListener, 'addListener');
+  t.ok(cmd.on, 'on');
+  t.ok(cmd.once, 'once');
+  t.ok(cmd.removeListener, 'removeListener');
+  t.ok(cmd.removeAllListeners, 'removeAllListeners');
+  t.ok(cmd.listeners, 'listeners');
+  
   t.end();
 });
 

@@ -7,10 +7,14 @@ test('flag: extends EventEmitter', function (t) {
   var EventEmitter = require('events').EventEmitter;
   var flg = flag('-t');
   
-  Object.keys(EventEmitter.prototype).forEach(function (key) {
-    
-    t.ok(flg[key], 'instance has EventEmitter value: ' + key);
-  });
+  t.ok(flg.emit, 'emit');
+  t.ok(flg.addListener, 'addListener');
+  t.ok(flg.on, 'on');
+  t.ok(flg.once, 'once');
+  t.ok(flg.removeListener, 'removeListener');
+  t.ok(flg.removeAllListeners, 'removeAllListeners');
+  t.ok(flg.listeners, 'listeners');
+  
   t.end();
 });
 
