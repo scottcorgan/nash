@@ -36,7 +36,6 @@ test('wrappers: adds multiple wrappers at a time', function (t) {
   
   wrap1.add(fn1);
   wrap1.add([fn1, fn2]);
-  
   wrap2.add(fn1, fn2);
   
   t.deepEqual(wrap1.all(), [[fn1], [fn1, fn2]], 'adds multiple functions from array');
@@ -54,54 +53,38 @@ test('wrappers: runs all the wrapper functions', function (t) {
   var wrapFn2Called = false;
   var wrapFn3Called = false;
   
-  wrap.add(function () {
+  wrap.add(function (done) {
     
     wrapFn1Called = true;
+    done();
   });
   
-  wrap.add(function () {
+  wrap.add(function (done) {
     
     wrapFn2Called = true;
-  }, function () {
+    done();
+  }, function (done) {
     
     wrapFn3Called = true;
+    done();
   });
   
-  wrap.run();
-  
-  t.ok(wrapFn1Called, 'called first fn');
-  t.ok(wrapFn2Called, 'called second fn');
-  t.ok(wrapFn3Called, 'called third fn');
-  t.end();
+  wrap.run(function () {
+    
+    t.ok(wrapFn1Called, 'called first fn');
+    t.ok(wrapFn2Called, 'called second fn');
+    t.ok(wrapFn3Called, 'called third fn');
+    t.end();
+  });
 });
 
 test('wrappers: runs wrapper functions with given values passed into functions', function (t) {
   
-  t.plan(2);  
+  t.plan(4);  
   
   var wrap = wrappers();
 
-  wrap.add(function (val1, val2) {
-    
-    t.equal(val1, 'val1', 'passed in value 1');
-    t.equal(val2, 'val2', 'passed in value 2');
-  });
-  
-  wrap.run('val1', 'val2');
-});
-
-test('wrappers: runs functions as async by passing in a callback as the last argument', function (t) {
-  
-  t.plan(4);
-  
-  var wrapperCalled = false;
-  var wrap = wrappers({
-    async: true
-  });
-  
   wrap.add(function (val1, val2, done) {
-    
-    wrapperCalled = true;
     
     t.equal(val1, 'val1', 'passed in value 1');
     t.equal(val2, 'val2', 'passed in value 2');
@@ -110,20 +93,18 @@ test('wrappers: runs functions as async by passing in a callback as the last arg
     done();
   });
   
-  wrap.run('val1', 'val2', function (err) {
+  wrap.run('val1', 'val2', function () {
     
-    t.notOk(err, 'no error passed');
+    t.ok(true, 'done');
   });
 });
 
-test('wrappers: runs commands added seperately in series with async option enabled', function (t) {
+test('wrappers: runs commands added seperately in series', function (t) {
   
   t.plan(1);
   
   var callstack = [];
-  var wrap = wrappers({
-    async: true
-  });
+  var wrap = wrappers();
   
   wrap
     .add(function (done) {
@@ -143,12 +124,10 @@ test('wrappers: runs commands added seperately in series with async option enabl
   });
 });
 
-test('wrappers: runs commands added together in parallel with async option enabled', function (t) {
+test('wrappers: runs commands added together in parallel', function (t) {
   
   var callstack = [];
-  var wrap = wrappers({
-    async: true
-  });
+  var wrap = wrappers();
   
   wrap
     .add(function (done) {
@@ -184,5 +163,4 @@ test('wrappers: runs commands added together in parallel with async option enabl
     t.deepEqual(callstack, expectedCallstack, 'called in series or parallel');
     t.end();
   });
-  
 });
