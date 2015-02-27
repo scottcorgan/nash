@@ -47,9 +47,11 @@ test('commands: add command to collection', function (t) {
 test('commands: does not overwrite command when adding to collection', function (t) {
   
   var cmds = commands();
+  var handler = function () {/* handler */};
   
   var cmd = defineCommand('test')
-    .description('test description');
+    .handler(handler);
+    // .description('test description');
   
   var cmd2 = defineCommand('test', 't');
   
@@ -57,7 +59,7 @@ test('commands: does not overwrite command when adding to collection', function 
   cmds.add(cmd2);
   
   t.equal(cmds.all().length, 1, 'one uqique');
-  t.equal(cmds.findByName('test').description(), cmd.description(), 'same command descriptions');
+  t.equal(cmds.findByName('test').handler().toString(), handler.bind(cmd).toString(), 'same command handler');
   t.ok(cmds.findByName('t'), 'adds missing names when commands match');
   t.end();
 });
@@ -80,45 +82,7 @@ test('commands: find command by name', function (t) {
   t.end();
 });
 
-test('commands: runs commands sync', function (t) {
-  
-  t.plan(4);
-  
-  var cmdRan = false;
-  var cmdFlagRan = true;
-  
-  var cmd = defineCommand('test')
-    .handler(function (value) {
-      
-      t.equal(value, 'data', 'commadn data passed in');
-      
-      cmdRan = true;
-    });
-    
-  cmd.flag('-t')
-    .handler(function (val) {
-      
-      t.equal(val, 't flag', 'flag data passed in ');
-      
-      cmdFlagRan = true;
-    });
-  
-  var cmds = commands(cmd);
-  
-  cmds.run({
-    name: 'test',
-    data: ['data'],
-    flags: {
-      t: 't flag'
-    }
-  }, function (err) {
-    
-    t.ok(cmdFlagRan, 'ran command flag');
-    t.ok(cmdRan, 'ran command');
-  });
-});
-
-test('commands: runs commands async', function (t) {
+test('commands: runs commands', function (t) {
   
   t.plan(5);
   
@@ -127,7 +91,6 @@ test('commands: runs commands async', function (t) {
   var ranAsyncFlag = false;
   
   var cmd = defineCommand('test')
-    .async()
     .handler(function (value, done) {
       
       t.equal(value, 'data', 'passed in data');
@@ -138,13 +101,13 @@ test('commands: runs commands async', function (t) {
     });
   
   cmd.flag('-t')
-    .handler(function (val) {
+    .handler(function (val, done) {
       
       ranFlag = true;
+      done();
     });
   
   cmd.flag('-a')
-    .async()
     .handler(function (val, done) {
       
       ranAsyncFlag = true;
