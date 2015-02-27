@@ -83,3 +83,12 @@ test('flag: running the flag', function (t) {
     });
   });
 });
+
+test('flag: prefixes', function (t) {
+  
+  t.equal(flag.prefix('test'), '--test', '2 dashes to a word');
+  t.equal(flag.prefix('t'), '-t', '1 dash for a letter');
+  t.equal(flag.prefix('--test'), '--test', 'add no dashes for a name with dashes already');
+  t.equal(flag.prefix('-t'), '-t', 'add no dashes for a letter with a dash already');
+  t.end();
+});

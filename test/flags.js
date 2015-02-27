@@ -45,9 +45,10 @@ test('flags: add flag to collection', function (t) {
 test('flags: does not overwrite flag when adding to collection', function (t) {
   
   var flgs = flags();
+  var handler = function () {/* handler */};
   
   var flg = flag('--test')
-    .description('test description');
+    .handler(handler);
   
   var flg2 = flag('--test', '-t');
   
@@ -55,7 +56,7 @@ test('flags: does not overwrite flag when adding to collection', function (t) {
   flgs.add(flg2);
   
   t.equal(flgs.all().length, 1, 'one uqique');
-  t.equal(flgs.findByName('test').description(), flg.description(), 'same flg descriptions');
+  t.equal(flgs.findByName('test').handler().toString(), handler.bind(flg).toString(), 'same flg handler');
   t.ok(flgs.findByName('-t'), 'adds missing names when flags match');
   t.end();
 });
@@ -77,15 +78,6 @@ test('flags: find flag by name', function (t) {
   t.end();
 });
 
-test('flags: adds dashes', function (t) {
-  
-  t.equal(flag.addDashes('test'), '--test', '2 dashes to a word');
-  t.equal(flag.addDashes('t'), '-t', '1 dash for a letter');
-  t.equal(flag.addDashes('--test'), '--test', 'add no dashes for a name with dashes already');
-  t.equal(flag.addDashes('-t'), '-t', 'add no dashes for a letter with a dash already');
-  t.end();
-});
-
 test('flags: runs flags', function (t) {
   
   t.plan(5);
@@ -94,23 +86,23 @@ test('flags: runs flags', function (t) {
   var flg2Ran = false;
   
   var flg1 = flag('-t')
-    .handler(function (value) {
+    .handler(function (value, done) {
       
-      t.equal(value, 't value', 'passed in value to sync');
+      t.equal(value, 't value', 'passed in value');
       
       flg1Ran = true;
+      done();
     });
     
   var flg2 = flag('--test2')
-  .async()
-  .handler(function (value, done) {
-    
-    t.equal(value, 'test2 value', 'passed in value to async');
-    t.ok(typeof done === 'function', 'passed in callback to async');
-    
-    flg2Ran = true;
-    done();
-  });
+    .handler(function (value, done) {
+      
+      t.equal(value, 'test2 value', 'passed in value');
+      t.ok(typeof done === 'function', 'passed in callback');
+      
+      flg2Ran = true;
+      done();
+    });
   
   var flgs = flags(flg1, flg2);
   
