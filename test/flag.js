@@ -92,3 +92,23 @@ test('flag: prefixes', function (t) {
   t.equal(flag.prefix('-t'), '-t', 'add no dashes for a letter with a dash already');
   t.end();
 });
+
+test('flag: unprefixes', function (t) {
+  
+  t.equal(flag.unprefix('--test'), 'test', '2 dashes to a word');
+  t.equal(flag.unprefix('-t'), 't', '1 dash for a letter');
+  t.equal(flag.unprefix('test'), 'test', 'add no dashes for a name with no dashes already');
+  t.equal(flag.unprefix('t'), 't', 'add no dashes for a letter with no dash already');
+  t.end();
+});
+
+test.skip('flag: default value', function (t) {
+  
+  var f = flag();
+  
+  f.default('my value');
+  
+  t.equal(f.default(), 'my value', 'set default');
+  t.deepEqual(f.default('another value'), f, 'chainable');
+  t.end();
+});

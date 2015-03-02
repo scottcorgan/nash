@@ -62,9 +62,9 @@ test('cli: command', function (t) {
 
 test('cli: flags', function (t) {
   
+  var handler = function () {/* handler */};
   var cli = nash();
   var flg = cli.flag('--test', '-t');
-  var handler = function () {/* handler */};
   
   flg.handler(handler);
   
@@ -72,6 +72,30 @@ test('cli: flags', function (t) {
   t.deepEqual(cli.flag('--test', '-t').name(), flag('--test', '-t').name(), 'creates instance of flag');
   t.equal(cli.flag('-t').handler().toString(), handler.bind(flg).toString(), 'return flag if already defined');
   t.end();
+});
+
+test.skip('cli: flag default value', function (t) {
+  
+  var cli = nash();
+  cli.flag('--default', '-d').default('default value');
+  cli.flag('--another', '-a').default('another default value');
+      
+  
+  cli.default()
+    .handler(function (done) {
+      
+      t.equal(cli.argv.d, 'my value', 'default value');
+      // t.equal(cli.argv.default, 'my value', 'default value');
+      // t.equal(cli.argv.a, 'another default value', 'default value');
+      // t.equal(cli.argv.another, 'another default value', 'default value');
+      done();
+    });
+  
+  
+  cli.run(['', '', 'some', '-d', 'my value'], function () {
+    
+    t.end();
+  });
 });
 
 test('cli: runs flags', function (t) {
