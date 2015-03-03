@@ -788,3 +788,30 @@ test('cli: getters/setters', function (t) {
   
   t.end();
 });
+
+test('cli: process data', function (t) {
+  
+  var cli = nash();
+  
+  cli.default()
+    .handler(function (data, flags, done) {
+      
+      t.equal(cli.process.command, 'command', 'command');
+      t.equal(cli.process.task, 'task', 'task');
+      t.deepEqual(cli.process.data, ['data'], 'data');
+      t.deepEqual(cli.process.flags, {flag: 'flag', f: 'flag'}, 'flags');
+      
+      cli.process.newValue = 'new value';
+      
+      t.notOk(cli.process.newValue, 'immutable');
+      
+      done();
+    });
+  
+  cli.flag('-f', '--flag');
+  
+  cli.run(['', '', 'command:task', 'data', '--flag', 'flag'], function () {
+    
+    t.end();
+  });
+});
