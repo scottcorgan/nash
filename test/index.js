@@ -35,10 +35,14 @@ test('cli: extends EventEmitter', function (t) {
   var EventEmitter = require('events').EventEmitter;
   var cli = nash();
   
-  Object.keys(EventEmitter.prototype).forEach(function (key) {
-    
-    t.ok(cli[key], 'instance has EventEmitter value: ' + key);
-  });
+  t.ok(cli.emit, 'emit');
+  t.ok(cli.addListener, 'addListener');
+  t.ok(cli.on, 'on');
+  t.ok(cli.once, 'once');
+  t.ok(cli.removeListener, 'removeListener');
+  t.ok(cli.removeAllListeners, 'removeAllListeners');
+  t.ok(cli.listeners, 'listeners');
+  
   t.end();
 });
 
@@ -46,27 +50,52 @@ test('cli: command', function (t) {
   
   var cli = nash();
   var cmd = cli.command('test', 't');
+  var handler = function () {/* handler */};
   
-  cmd.description('command description');
+  cmd.handler(handler);
   
   t.deepEqual(cli.internals.commands.all(), [cmd], 'adds command to collection');
   t.deepEqual(cli.command('test', 't').name(), command('test', 't').name(), 'creates instance of command');
-  t.equal(cli.command('test').description(), 'command description', 'return command if already defined');
-  t.equal(cli.command('t').description(), 'command description', 'return command if already defined');
+  t.equal(cli.command('test').handler().toString(), handler.bind(cmd).toString(), 'return command if already defined');
   t.end();
 });
 
 test('cli: flags', function (t) {
   
+  var handler = function () {/* handler */};
   var cli = nash();
   var flg = cli.flag('--test', '-t');
   
-  flg.description('flag description');
+  flg.handler(handler);
   
   t.deepEqual(cli.internals.flags.all(), [flg], 'adds flag to collection');
   t.deepEqual(cli.flag('--test', '-t').name(), flag('--test', '-t').name(), 'creates instance of flag');
-  t.equal(cli.flag('-t').description(), 'flag description', 'return flag if already defined');
+  t.equal(cli.flag('-t').handler().toString(), handler.bind(flg).toString(), 'return flag if already defined');
   t.end();
+});
+
+test.skip('cli: flag default value', function (t) {
+  
+  var cli = nash();
+  cli.flag('--default', '-d').default('default value');
+  cli.flag('--another', '-a').default('another default value');
+      
+  
+  cli.default()
+    .handler(function (done) {
+      
+      t.equal(cli.argv.d, 'my value', 'default value');
+      // t.equal(cli.argv.default, 'my value', 'default value');
+      // t.equal(cli.argv.a, 'another default value', 'default value');
+      // t.equal(cli.argv.another, 'another default value', 'default value');
+      done();
+    });
+  
+  
+  cli.run(['', '', 'some', '-d', 'my value'], function () {
+    
+    t.end();
+  });
 });
 
 test('cli: runs flags', function (t) {
@@ -80,27 +109,31 @@ test('cli: runs flags', function (t) {
   // Set up override flag
   var overrideFlag = flag('-o')
     .override()
-    .handler(function () {
+    .handler(function (val, done) {
       
       flagOverrideCalled = true;
+      done();
     });
   
   cli.flag('-f')
-    .handler(function (val) {
+    .handler(function (val, done) {
       
       flagCalled1 = true;
       t.equal(val, 'test value1', 'passes value 1');
+      done();
     });
   cli.flag('-t')
-    .handler(function (val) {
+    .handler(function (val, done) {
       
       flagCalled2 = true;
       t.equal(val, 'test value2', 'passes value 2');
+      done();
     });
   cli.flag('-o')
-    .handler(function () {
+    .handler(function (val, done) {
       
       cliOverrideFlagCalled = true;
+      done();
     });
   
   cli.runFlags({
@@ -120,28 +153,7 @@ test('cli: runs flags', function (t) {
   );
 });
 
-test('cli: runs a single flag in sync mode', function (t) {
-  
-  t.plan(3);
-  
-  var cli = nash();
-  var ranFlag = false;
-  
-  cli.flag('-t')
-    .handler(function (data) {
-      
-      t.equal(data, 'data', 'passed data into flag');
-      
-      ranFlag = true;
-    });
-  
-  var chained = cli.runFlag('t', 'data');
-  
-  t.deepEqual(chained, cli, 'is chainable');
-  t.ok(ranFlag, 'ran flag');
-});
-
-test('cli: runs a single flag in async mode', function (t) {
+test('cli: runs a single flag', function (t) {
   
   t.plan(2);
   
@@ -149,7 +161,6 @@ test('cli: runs a single flag in async mode', function (t) {
   var ranFlag = false;
   
   cli.flag('-t')
-    .async()
     .handler(function (data, done) {
       
       t.equal(data, 'data', 'passed data into flag');
@@ -179,50 +190,58 @@ test('cli: runs command', function (t) {
   var commandFlagCalled = false;
   var callstack = [];
   
-  cli.beforeAll(function (data, flags) {
+  cli.beforeAll(function (data, flags, done) {
     
     callstack.push('beforeAll');
+    done();
   });
-  cli.afterAll(function (data, flags) {
+  cli.afterAll(function (data, flags, done) {
     
     callstack.push('afterAll');
+    done();
   });
   cli.flag('-t')
-    .handler(function () {
+    .handler(function (val, done) {
       
       callstack.push('flag');
+      done();
     });
   cli.command('test')
-    .handler(function () {
+    .handler(function (data, flags, done) {
       
       callstack.push('command');
       handlerCalled = true;
+      done();
     })
     .flag('-t')
-      .handler(function () {
+      .handler(function (val, done) {
         
         commandFlagCalled = true;
+        done();
       });
-  cli.run(['', '', 'test', '-t']);
-  
-  t.ok(handlerCalled, 'runs the command');
-  t.deepEqual(callstack, ['beforeAll', 'flag', 'command', 'afterAll'], 'execution order');
-  t.ok(commandFlagCalled, 'calls cli and command flags if not overridden');
-  
-  callstack = [];
-  handlerCalled = false;
-  
-  cli.command('test')
-    .handler(function (data) {
+  cli.run(['', '', 'test', '-t'], function () {
+    
+    t.ok(handlerCalled, 'runs the command');
+    t.deepEqual(callstack, ['beforeAll', 'flag', 'command', 'afterAll'], 'execution order');
+    t.ok(commandFlagCalled, 'calls cli and command flags if not overridden');
+    
+    callstack = [];
+    handlerCalled = false;
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
+        
+        handlerCalled = true;
+        t.equal(data[0], 'data', 'passes data to handler');
+        done();
+      });
+    
+    cli.run(['', '', 'test', 'data'], function () {
       
-      handlerCalled = true;
-      t.equal(data, 'data', 'passes data to handler');
+      t.ok(handlerCalled, 'runs the command with data');
+      t.end();
     });
-  
-  cli.run(['', '', 'test', 'data']);
-  
-  t.ok(handlerCalled, 'runs the command with data');
-  t.end();
+  });
 });
 
 test('cli: command level flags can override cli level flags', function (t) {
@@ -233,26 +252,29 @@ test('cli: command level flags can override cli level flags', function (t) {
   var commandFlagCallCount = 0;
   
   cli.flag('-t')
-    .handler(function () {
+    .handler(function (val, done) {
       
       cliFlagCalled = true;
+      done();
     });
     
   cli.command('test')
     .flag('-t')
       .override()
-      .handler(function () {
+      .handler(function (val, done) {
         
         commandFlagCallCount += 1;
         commandFlagCalled = true;
+        done();
       });
   
-  cli.run(['', '', 'test', '-t']);
-  
-  t.ok(commandFlagCalled, 'command flag');
-  t.notOk(cliFlagCalled, 'cli flag');
-  t.equal(commandFlagCallCount, 1, 'flag only called once');
-  t.end();
+  cli.run(['', '', 'test', '-t'], function () {
+    
+    t.ok(commandFlagCalled, 'command flag');
+    t.notOk(cliFlagCalled, 'cli flag');
+    t.equal(commandFlagCallCount, 1, 'flag only called once');
+    t.end();
+  });
 });
 
 test('cli: task level flags can override cli level flags', function (t) {
@@ -263,36 +285,40 @@ test('cli: task level flags can override cli level flags', function (t) {
   var taskFlagCallCount = 0;
   
   cli.flag('-t')
-    .handler(function () {
+    .handler(function (val, done) {
       
       cliFlagCalled = true;
+      done();
     });
     
   cli.command('test')
     .task('task')
       .flag('-t')
         .override()
-        .handler(function () {
+        .handler(function (val, done) {
           
           taskFlagCallCount += 1;
           taskFlagCalled = true;
+          done();
         });
   
-  cli.run(['', '', 'test:task', '-t']);
-  
-  t.ok(taskFlagCalled, 'command flag');
-  t.notOk(cliFlagCalled, 'cli flag');
-  t.equal(taskFlagCallCount, 1, 'flag only called once');
-  t.end();
+  cli.run(['', '', 'test:task', '-t'], function () {
+    
+    t.ok(taskFlagCalled, 'command flag');
+    t.notOk(cliFlagCalled, 'cli flag');
+    t.equal(taskFlagCallCount, 1, 'flag only called once');
+    t.end();
+  });
 });
 
 test('cli: sets argv on cli level', function (t) {
   
   var cli = nash();
-  cli.run(['', '', 'command', '-f', 'value']);
-  
-  t.deepEqual(cli.argv, { _: [ 'command' ], f: 'value' }, 'argv set on proto');
-  t.end();
+  cli.run(['', '', 'command', '-f', 'value'], function () {
+    
+    t.deepEqual(cli.argv, { _: [ 'command' ], f: 'value' }, 'argv set on proto');
+    t.end();
+  });
 });
 
 test('cli: runs command task', function (t) {
@@ -301,16 +327,18 @@ test('cli: runs command task', function (t) {
   var taskRan = false;
   cli.command('test')
     .task('task')
-    .handler(function (data) {
+    .handler(function (data, flags, done) {
       
-      t.equal(data, 'data', 'passes data to task handler');
+      t.equal(data[0], 'data', 'passes data to task handler');
       taskRan = true;
+      done();
     });
   
-  cli.run(['', '', 'test:task', 'data']);
-  
-  t.ok(taskRan, 'ran the task');
-  t.end();
+  cli.run(['', '', 'test:task', 'data'], function () {
+    
+    t.ok(taskRan, 'ran the task');
+    t.end();
+  });
 });
 
 test('cli: runs beforeAlls', function (t) {
@@ -321,28 +349,31 @@ test('cli: runs beforeAlls', function (t) {
   var beforeAllRan3 = false;
   
   var chained = cli
-    .beforeAll(function (data, flags) {
+    .beforeAll(function (data, flags, done) {
       
       beforeAllRan1 = true;
       
       t.deepEqual(this, cli, 'bound to cli object');
       t.deepEqual(data, ['data'], 'passed in data');
       t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+      done();
     })
     .beforeAll(
-      function (data, flags) {
+      function (data, flags, done) {
         
         beforeAllRan2 = true;
         
         t.deepEqual(data, ['data'], 'passed in data');
         t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+        done();
       },
-      function (data, flags) {
+      function (data, flags, done) {
         
         beforeAllRan3 = true;
         
         t.deepEqual(data, ['data'], 'passed in data');
         t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+        done();
       }
     );
   
@@ -364,28 +395,31 @@ test('cli: runs afterAlls', function (t) {
   var afterAllRan3 = false;
   
   var chained = cli
-    .afterAll(function (data, flags) {
+    .afterAll(function (data, flags, done) {
       
       afterAllRan1 = true;
       
       t.deepEqual(this, cli, 'bound to cli object');
       t.deepEqual(data, ['data'], 'passed in data');
       t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+      done();
     })
     .afterAll(
-      function (data, flags) {
+      function (data, flags, done) {
         
         afterAllRan2 = true;
         
         t.deepEqual(data, ['data'], 'passed in data');
         t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+        done();
       },
-      function (data, flags) {
+      function (data, flags, done) {
         
         afterAllRan3 = true;
         
         t.deepEqual(data, ['data'], 'passed in data');
         t.deepEqual(flags, {t: 'flagged'}, 'passed in flags');
+        done();
       }
     );
   
@@ -405,12 +439,6 @@ test('cli: finds a command', function (t) {
   var cmd = cli.command('test');
   
   t.deepEqual(cli.findCommand('test'), cmd, 'by command name');
-  
-  // TODO: why do we need to find a command with a task name if
-  // we have findCommandTask()?
-  // 
-  // t.notOk(cli.findCommand('test', 'task'), 'by command name with a task name');
-  
   t.end();
 });
 
@@ -424,85 +452,74 @@ test('cli: finds a command task', function (t) {
   t.end();
 });
 
-test('cli: on invalid command', function (t) {
-  
-  var cli = nash();
-  var commandCalled = false;
-  
-  var chain = cli.onInvalidCommand(function (commandName, data, flags) {
-    
-    commandCalled = true;  
-    
-    t.equal(commandName, 'noop', 'passes in command name');
-    t.deepEqual(data, ['data'], 'passes in data');
-    t.deepEqual(flags, {t: 'flagged'}, 'passes in flags');
-  });
-  
-  cli.run(['', '', 'noop', 'data', '-t', 'flagged']);
-  
-  t.ok(commandCalled, 'ran');
-  t.deepEqual(chain, cli, 'chainable');
-  t.end();
-});
-
 test('cli: default command', function (t) {
   
   var cli = nash();
   var commandCalledCount = 0;
   
   cli.default()
-    .handler(function () {
+    .handler(function (data, flags, done) {
       
       commandCalledCount += 1;
+      done();
     });
-  cli.run();
-  t.equal(commandCalledCount, 1, 'command ran first time');
-  
-  var defaultCommand = cli.default();
-  cli.run();
-  t.equal(commandCalledCount, 2, 'ran same default command');
-  
-  t.end();
+  cli.run([], function () {
+    
+    t.equal(commandCalledCount, 1, 'command ran first time');
+    
+    var defaultCommand = cli.default();
+    cli.run([], function () {
+      
+      t.equal(commandCalledCount, 2, 'ran same default command');
+      
+      t.end();
+    });
+  });
 });
 
 test('cli: all arguments get passed to default command', function (t) {
   
+  t.plan(2);
+  
   var cli = nash();
   
   cli.default()
-    .handler(function (arg1, arg2) {
+    .handler(function (data, flags, done) {
       
-      t.equal(arg1, 'arg1', 'argument 1 passed');
-      t.equal(arg2, 'arg2', 'argument 2 passed');
+      t.equal(data[0], 'arg1', 'argument 1 passed');
+      t.equal(data[1], 'arg2', 'argument 2 passed');
+      done();
     });
   cli.run(['', '', 'arg1', 'arg2']);
-  
-  t.end();
 });
 
 test('cli: global flags work with default command', function (t) {
+  
+  t.plan(2);
   
   var cli = nash();
   var commandCalled = false;
   var flagCalled = false;
   
   cli.flag('--help', '-h')
-    .handler(function () {
+    .handler(function (val, done) {
       
       flagCalled = true;
+      done();
     });
   
   cli.default()
-    .handler(function () {
+    .handler(function (data, flags, done) {
       
       commandCalled = true;
+      done();
     });
     
-  cli.run(['', '', '-h']);
-  t.ok(commandCalled, 'command ran');
-  t.ok(flagCalled, 'flag ran');
-  
-  t.end();
+  cli.run(['', '', '-h'], function () {
+    
+    t.ok(commandCalled, 'command ran');
+    t.ok(flagCalled, 'flag ran');
+  });
 });
 
 test('cli: decorates commands', function (t) {
@@ -548,7 +565,7 @@ test('cli: decorates flags', function (t) {
   flg.test('data');
 });
 
-test('cli: register a plugin', function (t) {
+test('cli: register an array of plugins', function (t) {
   
   t.plan(3);
   
@@ -556,63 +573,120 @@ test('cli: register a plugin', function (t) {
   var commandCalled = false;
   var ranBeforeAll = false;
   
-  var plugin1 = {
-    register: function (cli, options) {
+  var plugin1 = function (cli, options, done) {
+    
+    cli.beforeAll(function (data, flags, done) {
       
-      cli.beforeAll(function () {
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        commandCalled = true;
+        done();
       });
-      
-      cli.command('test')
-        .handler(function () {
-          
-          commandCalled = true;
-        });
-      
-      t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
-    }
+    
+    t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
+    
+    done();
   };
   
-  cli.register(plugin1, {
-    key: 'value'
+  cli.register([
+    {
+      register: plugin1,
+      options: {
+        key: 'value'
+      }
+    }
+  ], function () {
+    
+    cli.run(['', '', 'test'], function () {
+      
+      t.ok(commandCalled, 'ran command from plugin');
+      t.ok(ranBeforeAll, 'ran before all from plugin');
+    });
   });
+});
+
+test('cli: register a single plugin', function (t) {
   
-  cli.run(['', '', 'test']);
+  t.plan(3);
   
-  t.ok(commandCalled, 'ran command from plugin');
-  t.ok(ranBeforeAll, 'ran before all from plugin');
+  var cli = nash();
+  var commandCalled = false;
+  var ranBeforeAll = false;
+  
+  var plugin1 = function (cli, options, done) {
+      
+    cli.beforeAll(function (data, flags, done) {
+      
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
+        
+        commandCalled = true;
+        done();
+      });
+    
+    t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
+    
+    done();
+  };
+  
+  cli.register({
+    register: plugin1,
+    options: {
+      key: 'value'
+    }
+  }, function () {
+    
+    cli.run(['', '', 'test'], function () {
+      
+      t.ok(commandCalled, 'ran command from plugin');
+      t.ok(ranBeforeAll, 'ran before all from plugin');
+    });
+  });
 });
 
 test('cli: registers plugin with no options', function (t) {
   
+  t.plan(2);
+  
   var cli = nash();
   var commandCalled = false;
   var ranBeforeAll = false;
   
-  var plugin1 = {
-    register: function (cli, options) {
+  var plugin1 = function (cli, options, done) {
       
-      cli.beforeAll(function () {
+    cli.beforeAll(function (data, flags, done) {
+      
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        commandCalled = true;
+        done();
       });
-      
-      cli.command('test')
-        .handler(function () {
-          
-          commandCalled = true;
-        });
-    }
+    
+    done();
   };
   
-  cli.register(plugin1, {test: 'me'});
-  
-  cli.run(['', '', 'test']);
-  
-  t.ok(commandCalled, 'ran command from plugin');
-  t.ok(ranBeforeAll, 'ran before all from plugin');
-  t.end();
+  cli.register({register: plugin1}, function () {
+    
+    cli.run(['', '', 'test'], function () {
+      
+      t.ok(commandCalled, 'ran command from plugin');
+      t.ok(ranBeforeAll, 'ran before all from plugin');
+    });
+  });
 });
 
 test('cli: registers multiple plugins as an array', function (t) {
@@ -624,91 +698,57 @@ test('cli: registers multiple plugins as an array', function (t) {
   var command2Called = false;
   var ranBeforeAll = false;
   
-  var plugin1 = {
-    register: function (cli, options) {
+  var plugin1 = function (cli, options, done) {
+    
+    cli.beforeAll(function (data, flags, done) {
       
-      cli.beforeAll(function () {
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        commandCalled = true;
+        done();
       });
-      
-      cli.command('test')
-        .handler(function () {
-          
-          commandCalled = true;
-        });
-    }
+    
+    done();
   };
   
-  var plugin2 = {
-    register: function (cli, options) {
-      
-      cli.command('test2')
-        .handler(function () {
-          
-          command2Called = true;
-        });
-    }
-  };
-  
-  cli.register([plugin1, plugin2], {
-    key: 'value'
-  });
-  
-  cli.run(['', '', 'test']);
-  cli.run(['', '', 'test2']);
-  
-  t.ok(commandCalled, 'ran command from plugin');
-  t.ok(ranBeforeAll, 'ran before all from plugin');
-  t.ok(command2Called, 'ran command 2 from plugin');
-});
-
-test('cli: registers multiple plugins as an array', function (t) {
-  
-  t.plan(3);
-  
-  var cli = nash();
-  var commandCalled = false;
-  var command2Called = false;
-  var ranBeforeAll = false;
-  
-  var plugin1 = {
-    register: function (cli, options) {
-      
-      cli.beforeAll(function () {
+  var plugin2 = function (cli, options, done) {
+    
+    cli.command('test2')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        command2Called = true;
+        done();
       });
-      
-      cli.command('test')
-        .handler(function () {
-          
-          commandCalled = true;
-        });
-    }
+    
+    done();
   };
   
-  var plugin2 = {
-    register: function (cli, options) {
-      
-      cli.command('test2')
-        .handler(function () {
-          
-          command2Called = true;
-        });
+  cli.register([
+    {
+      register: plugin1,
+      options: {key: 'value'}
+    }, 
+    {
+      register: plugin2,
+      options: {key: 'value'}
     }
-  };
-  
-  cli.register(plugin1, plugin2, {
-    key: 'value'
+  ], function () {
+    
+    cli.run(['', '', 'test'], function () {
+      
+      cli.run(['', '', 'test2'], function () {
+        
+        t.ok(commandCalled, 'ran command from plugin');
+        t.ok(ranBeforeAll, 'ran before all from plugin');
+        t.ok(command2Called, 'ran command 2 from plugin');
+      });
+    });
   });
-  
-  cli.run(['', '', 'test']);
-  cli.run(['', '', 'test2']);
-  
-  t.ok(commandCalled, 'ran command from plugin');
-  t.ok(ranBeforeAll, 'ran before all from plugin');
-  t.ok(command2Called, 'ran command 2 from plugin');
 });
 
 test('cli: getters/setters', function (t) {
@@ -722,5 +762,40 @@ test('cli: getters/setters', function (t) {
   t.ok(typeof cli.get === 'function', 'getter exists');
   t.equal(cli.get('key'), 'value', 'getter');
   
+  cli.set({
+    key1: 'value1',
+    key2: 'value2'
+  });
+  
+  t.equal(cli.get('key1'), 'value1', 'set first value');
+  t.equal(cli.get('key2'), 'value2', 'set second value');
+  
   t.end();
+});
+
+test('cli: process data', function (t) {
+  
+  var cli = nash();
+  
+  cli.default()
+    .handler(function (data, flags, done) {
+      
+      t.equal(cli.process.command, 'command', 'command');
+      t.equal(cli.process.task, 'task', 'task');
+      t.deepEqual(cli.process.data, ['data'], 'data');
+      t.deepEqual(cli.process.flags, {flag: 'flag', f: 'flag'}, 'flags');
+      
+      cli.process.newValue = 'new value';
+      
+      t.notOk(cli.process.newValue, 'immutable');
+      
+      done();
+    });
+  
+  cli.flag('-f', '--flag');
+  
+  cli.run(['', '', 'command:task', 'data', '--flag', 'flag'], function () {
+    
+    t.end();
+  });
 });
