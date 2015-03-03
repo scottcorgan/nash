@@ -439,12 +439,6 @@ test('cli: finds a command', function (t) {
   var cmd = cli.command('test');
   
   t.deepEqual(cli.findCommand('test'), cmd, 'by command name');
-  
-  // TODO: why do we need to find a command with a task name if
-  // we have findCommandTask()?
-  // 
-  // t.notOk(cli.findCommand('test', 'task'), 'by command name with a task name');
-  
   t.end();
 });
 

@@ -111,8 +111,6 @@ test('flags: runs flags', function (t) {
     test2: 'test2 value'
   }, function (err) {
     
-    // TODO: test for returning error
-    
     t.ok(flg1Ran, 'ran flag 1');
     t.ok(flg2Ran, 'ran flag 2');
   });
