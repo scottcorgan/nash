@@ -18,13 +18,11 @@ Craft command-line masterpieces
   * [handler](#handlercallback)
   * [task](#taskname-name-)
   * [flag](#flagname-name-)
-  * [async](#async)
   * [before](#beforecallback-callback-)
   * [after](#aftercallback-callback-)
   * [name](#namename-name-)
 * [Flag](#flag)
   * [handler](#handlercallback-1)
-  * [async](#async-1)
   * [override](#override)
   * [name](#namename-name--1)
 * [Plugins](#plugins)
@@ -72,21 +70,25 @@ cli.run(process.argv);
 
 ## Cli
 
-### run(argv)
+### run(argv[, callback])
 
-Run the cli app with the given arguments. Normally you'd pass in `process.argv`.
+Run the cli app with the given arguments. Normally you'd pass in `process.argv`. The callback can be used to execute more code after everything has completed.
 
 ```js
 var nash = require('nash');
 var cli = nash();
 
 cli.command('some-command')
-  .handler(function () {
+  .handler(function (data, flags, done) {
   
-		console.log('Some Command');
+    console.log('Some Command');
+    done();
   });
   
-cli.run(process.argv);
+cli.run(process.argv, function () {
+  
+  // All done
+});
 ```
 
 ### command(name[, names, ...])
@@ -98,9 +100,10 @@ var nash = require('nash');
 var cli = nash();
 
 cli.command('some-command')
-  .handler(function () {
+  .handler(function (data, flags, done) {
   	
     // Do something here
+    done();
   });
 ```
 
@@ -113,9 +116,10 @@ var nash = require('nash');
 var cli = nash();
 
 cli.default()
-  .handler(function (flags) {
+  .handler(function (data, flags, done) {
   
     // Do stuff here
+    done();
   });
 
 cli.run([]);
@@ -130,10 +134,11 @@ var nash = require('nash');
 var cli = nash();
 
 cli.flag('-f')
-	.handler(function (value) {
+  .handler(function (value, done) {
   
   	// Do something with this flag value
-	});
+    done();
+  });
 ```
 
 ### beforeAll(callback[, callback, ...])
@@ -147,21 +152,26 @@ Add a function or functions to be called before any commands or flags are run. T
 var nash = require('nash');
 var cli = nash();
 
-cli.beforeAll(function (data, flags) {
+cli.beforeAll(function (data, flags, done) {
 
   // data === ['value']
   // flags === {f: 'flag-value'}
+  done();
 });
 
 cli.command('some-command')
-	.handler(function () {})
+  .handler(function (data, flags, doen) {
+  
+    done();
+  })
   .flag('-f')
-  	.handler(function () {});
+    .handler(function (val, done) {
+    
+      done();
+    });
 
 // This is usually sent in via process.argv
 cli.run(['', '', 'some-command', 'value', '-f', 'flag-value']); 
-
-
 ```
 
 ### afterAll(callback[, callback, ...])
@@ -172,8 +182,21 @@ Does the same thing as `beforeAll()`, except runs the callbacks after all the co
 
 Cli-level/app-level settings. Set the given `name` to the given `value
 
-* `name` - name of key
+* `name` - name of key. Name, can also be a key/value object of multiple values
 * `value` - value of name
+
+```js
+
+var nash = require('nash');
+var cli = nash();
+
+cli.set('key', 'value');
+cli.set({
+  key1: 'value1',
+  key2: 'value2'
+});
+
+```
 
 ### get(name)
 
@@ -181,7 +204,7 @@ Cli-level/app-level getter for settings.
 
 * `name` - name of key to get
 
-### register(plugin[, options])
+### register(plugin(s), callback)
 
 Register a plugin with your command-line application. This provides extensibility and modularity. See [Plugins](#plugins) for more information.
 
@@ -191,7 +214,7 @@ Running `cli.command('name')` creates an instance of the Command class with foll
 
 ### handler(callback)
 
-The callback gets executed when the command is called. Any values passed in to the run method on the cli get passed into the callback. If the command is in async mode, the last parameter passed to the callback is the function to call when you're done.
+The callback gets executed when the command is called. Any values passed in to the run method on the cli get passed into the callback. You must call the `done()` callback to pass execution back to the cli.
 
 ```js
 var nash = require('nash');
@@ -200,16 +223,9 @@ var cli = nash();
 
 // Sync mode
 cli.command('some-command')
-  .handler(function (value) {
+  .handler(function (data, flags, done) {
 
     // value === 'value'
-  });
-
-// Async mode
-cli.command('async-command')
-	.async()
-  .handler(function (value, done) {
-  	
     done();
   });
 
@@ -228,9 +244,10 @@ var cli = nash();
 
 cli.command('command')
   .task('task', 'tsk')
-  .handler(function () {
+  .handler(function (data, flags, done) {
   	
     // Do something here
+    done();
   });
   
 cli.run(['', '', 'command:task']);
@@ -246,30 +263,13 @@ var cli = nash();
 
 cli.command('command')
   .flag('-f', '--flag')
-  .handler(function (value) {
+  .handler(function (value, done) {
   
-  	// Do something here
-  });
-
-cli.run(['', '', 'command', '-f']);
-```
-
-### async()
-
-Puts the command in async mode. If the command is in async mode, the last argument passed to the handler callback is the function to call when you're done. If no value is passed into the method, it is assumed to be true. You can also pass in `false` to the method to turn off async mode.
-
-```js
-var nash = require('nash');
-var cli = nash();
-
-cli.command('command');
-  .async()
-  .handler(function (done) {
-  	
+    // Do something here
     done();
   });
 
-cli.run(['', '', 'command']);
+cli.run(['', '', 'command', '-f']);
 ```
 
 ### before(callback[, callback, ...])
@@ -282,7 +282,7 @@ This is the same as the `before()` method, except this is called after the comma
 
 ### name(name[, name, ...])
 
-Add more names to the command. Helpful if you want aliases or mispellings to trigger the command.
+Add more names to the command. Helpful if you want aliases or mispellings to trigger the command. This can also be used to get all the aliases for a given command.
 
 
 ```js
@@ -299,7 +299,7 @@ Running `cli.flag('name')` or `cli.command('name').flag('name')` creates an inst
 
 ### handler(callback)
 
-The callback gets executed when the flag is called. Any values passed in to the run method on the cli get passed into the callback. If the flag is in async mode, the last parameter passed to the callback is the function to call when you're done.
+The callback gets executed when the flag is called. Any values passed in to the run method on the cli get passed into the callback. The `done()` callback must be called to pass execution back to the cli.
 
 ```js
 var nash = require('nash');
@@ -309,18 +309,9 @@ var cli = nash();
 // Sync mode
 cli.command('some-command')
   .flag('-f')
-  .handler(function () {
+  .handler(function (value, done) {
   
-  	// Do something here
-  });
-
-// Async mode
-cli.command('async-command')
-	.flag('-f')
-  .async()
-  .handler(function (done) {
-  
-  	// Do something here
+    // Do something here
     done();
   });
 
@@ -329,10 +320,6 @@ cli.command('async-command')
 cli.run(['', '', 'some-command', '-f']);
 
 ```
-
-### async()
-
-If no value or a value of `true` is passed in, the flag will be set to async mode and will receive a callback as the last paraemter to be called when done.
 
 ### override()
 
@@ -344,16 +331,18 @@ var cli = nash();
 
 
 cli.flag('-f')
-	.handler(function () {
-  
+	.handler(function (value, done) {
+    
+    done():
   });
 
 cli.command('some-command')
   .flag('-f')
   .override()
-  .handler(function () {
+  .handler(function (value, done) {
   
-  	// Only this flag runs for -f
+    // Only this flag runs for -f
+    done();
   });
   
 cli.run(['', '', 'some-command', '-f']);
@@ -375,7 +364,11 @@ cli.command('command')
 
 ## Plugins
 
-Nash lets you register plugins via the [`register`](#registerplugin-options) method on the cli object. This makes it easier to break up your command-line app as it grows.
+Nash lets you register plugins via the [`register`](#registerplugin-options) method on the cli object. This makes it easier to break up your app as it grows.
+
+YOu can register an array of plugins or a single plugin. Each object used to register the plugin must contain a `register` key with the value being the plugin function. See below for examples.
+
+Optionally, you can provide an options object to pass to each plugin.
 
 **Example of registering a plugin:**
 
@@ -384,28 +377,38 @@ var nash = require('nash');
 var myPlugin = require('my-plugin');
 var cli = nash();
 
-cli.register(myPlugin, {
-  option1: 'this data gets passed to the plugin'
+cli.register([{
+  register: myPlugin,
+  options: {
+    key: 'value'
+  }
+}], function (err) {
+
+  // Done loading plugins
 });
 ```
 
 **Example plugin:**
 
 ```js
-exports.register = function (cli, options) {
+module.exports = function (cli, options, done) {
   
   cli.command('something')
-    .handler(function () {
+    .handler(function (data, flags, done) {
       
       // Do something here
+      done();
     });
+  
+  done();
 };
 ```
 
-Each plugin must export a `register()` method. This method is called and given the arguments:
+Each plugin must export a function. This method is called and given the arguments:
 
-1. cli object
-2. options you pass when registering the plugin
+1. Cli object.
+2. Options you pass when registering the plugin.
+3. Callback. This must be called in order to complete the registration process
 
 
 ## Run Tests
