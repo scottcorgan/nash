@@ -45,27 +45,23 @@ cli.beforeAll(function () {
 });
 
 cli.flag('-p')
-  .handler(function () {
+  .handler(function (value, done) {
     
     // Do something when this flag is triggered
-  });
-
-cli.command('list')
-  .handler(function () {
-    
-    // Do something here
-  });
-
-cli.command('async-command')
-  .async()
-  .handler(function (data, done) {
-    
-    // If do some async stuff;
-    
     done();
   });
 
-cli.run(process.argv);
+cli.command('list')
+  .handler(function (data, flags, done) {
+    
+    // Do something here
+    done();
+  });
+
+cli.run(process.argv, function (err) {
+
+  // All done!
+});
 ```
 
 ## Cli
