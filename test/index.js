@@ -778,5 +778,13 @@ test('cli: getters/setters', function (t) {
   t.ok(typeof cli.get === 'function', 'getter exists');
   t.equal(cli.get('key'), 'value', 'getter');
   
+  cli.set({
+    key1: 'value1',
+    key2: 'value2'
+  });
+  
+  t.equal(cli.get('key1'), 'value1', 'set first value');
+  t.equal(cli.get('key2'), 'value2', 'set second value');
+  
   t.end();
 });
