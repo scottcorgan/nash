@@ -573,26 +573,24 @@ test('cli: register an array of plugins', function (t) {
   var commandCalled = false;
   var ranBeforeAll = false;
   
-  var plugin1 = {
-    register: function (cli, options, done) {
+  var plugin1 = function (cli, options, done) {
+    
+    cli.beforeAll(function (data, flags, done) {
       
-      cli.beforeAll(function (data, flags, done) {
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        commandCalled = true;
         done();
       });
-      
-      cli.command('test')
-        .handler(function (data, flags, done) {
-          
-          commandCalled = true;
-          done();
-        });
-      
-      t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
-      
-      done();
-    }
+    
+    t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
+    
+    done();
   };
   
   cli.register([
@@ -620,26 +618,24 @@ test('cli: register a single plugin', function (t) {
   var commandCalled = false;
   var ranBeforeAll = false;
   
-  var plugin1 = {
-    register: function (cli, options, done) {
+  var plugin1 = function (cli, options, done) {
       
-      cli.beforeAll(function (data, flags, done) {
+    cli.beforeAll(function (data, flags, done) {
+      
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        commandCalled = true;
         done();
       });
-      
-      cli.command('test')
-        .handler(function (data, flags, done) {
-          
-          commandCalled = true;
-          done();
-        });
-      
-      t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
-      
-      done();
-    }
+    
+    t.deepEqual(options, {key: 'value'}, 'passed options into plugin');
+    
+    done();
   };
   
   cli.register({
@@ -665,24 +661,22 @@ test('cli: registers plugin with no options', function (t) {
   var commandCalled = false;
   var ranBeforeAll = false;
   
-  var plugin1 = {
-    register: function (cli, options, done) {
+  var plugin1 = function (cli, options, done) {
       
-      cli.beforeAll(function (data, flags, done) {
+    cli.beforeAll(function (data, flags, done) {
+      
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        commandCalled = true;
         done();
       });
-      
-      cli.command('test')
-        .handler(function (data, flags, done) {
-          
-          commandCalled = true;
-          done();
-        });
-      
-      done();
-    }
+    
+    done();
   };
   
   cli.register({register: plugin1}, function () {
@@ -704,38 +698,34 @@ test('cli: registers multiple plugins as an array', function (t) {
   var command2Called = false;
   var ranBeforeAll = false;
   
-  var plugin1 = {
-    register: function (cli, options, done) {
+  var plugin1 = function (cli, options, done) {
+    
+    cli.beforeAll(function (data, flags, done) {
       
-      cli.beforeAll(function (data, flags, done) {
+      ranBeforeAll = true;
+      done();
+    });
+    
+    cli.command('test')
+      .handler(function (data, flags, done) {
         
-        ranBeforeAll = true;
+        commandCalled = true;
         done();
       });
-      
-      cli.command('test')
-        .handler(function (data, flags, done) {
-          
-          commandCalled = true;
-          done();
-        });
-      
-      done();
-    }
+    
+    done();
   };
   
-  var plugin2 = {
-    register: function (cli, options, done) {
-      
-      cli.command('test2')
-        .handler(function (data, flags, done) {
-          
-          command2Called = true;
-          done();
-        });
-      
-      done();
-    }
+  var plugin2 = function (cli, options, done) {
+    
+    cli.command('test2')
+      .handler(function (data, flags, done) {
+        
+        command2Called = true;
+        done();
+      });
+    
+    done();
   };
   
   cli.register([
