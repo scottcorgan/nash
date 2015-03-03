@@ -16,6 +16,7 @@
 * **[#52](https://github.com/scottcorgan/nash/issues/52)** - NEW: Create cli-level process object with argv data (command, task, data, flags, etc.)
 * **[#53](https://github.com/scottcorgan/nash/issues/53)** - Run tests on Travis instead of Codeship
 * **[#54](https://github.com/scottcorgan/nash/issues/54)** - NEW: set values with an object
+* **[#55](https://github.com/scottcorgan/nash/issues/55)** - BREAKING: plugins should just export a function
 
 ### Breaking Changes
 
@@ -24,6 +25,7 @@ There are quite a few breaking changes in this release. They are noted above. Se
 * All commands, flags, befores, and afters are assumed async. All features that could be run in a synchronous way have been updated to use only the async mode. This creates consistency across the module and gives us one less thing to think about.
 * Handlers on commands now receive 3 arguments always: `data`, `flags`, `done`. The `data` argument is an array of all the non-command and non-flag data from `process.argv`. The `flags` object is a key/value map of flags defined on the cli and used from `process.argv`. The `done` argument is the callback that must be called to pass execution back to the cli level.
 * Several command and flag level methods have been removed. They are listed above.
+* How plugins are registered and changed slightly. Instead of exporting a register function in the plugin, a plugin should now export a function.
 
 
 * * *
