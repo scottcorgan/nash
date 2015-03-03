@@ -91,9 +91,9 @@ test('commands: runs commands', function (t) {
   var ranAsyncFlag = false;
   
   var cmd = defineCommand('test')
-    .handler(function (value, done) {
+    .handler(function (data, flags, done) {
       
-      t.equal(value, 'data', 'passed in data');
+      t.equal(data[0], 'data', 'passed in data');
       t.ok(typeof done === 'function', 'passed in callback');
       
       cmdRan = true;

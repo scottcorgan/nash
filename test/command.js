@@ -32,13 +32,13 @@ test('command: handler', function (t) {
   
   var handlerCalled = false;
   var cmd = command('test')
-    .handler(function (done) {
+    .handler(function (data, flags, done) {
       
       handlerCalled = true;
       done();
     });
   
-  cmd.handler()(function () {
+  cmd.handler()([], {}, function () {
     
     t.equal(typeof cmd.handler(), 'function', 'gets function');
     t.ok(handlerCalled, 'sets the function');
@@ -176,7 +176,6 @@ test('command: runs afters', function (t) {
   });
 });
 
-// TODO: start testing for command HERE!!!!!!!
 test('command: runs flags', function (t) {
   
   var cmd = command('test');
@@ -243,7 +242,7 @@ test('command: running the command', function (t) {
       done();
     });
   
-  cmd.handler(function (done) {
+  cmd.handler(function (data, flags, done) {
     
     callstack.push('handler');
     done();
@@ -264,41 +263,43 @@ test('command: running the command', function (t) {
   });
 });
 
-test('command: run command in async mode', function (t) {
+test('command: run command', function (t) {
   
   var handlerCalled = false;
   var cmd = command('test')
-    .handler(function (data1, data2, done) {
+    // .handler(function (data1, data2, done) {
+    .handler(function (data, flags, done) {
       
       handlerCalled = true;
       
-      t.deepEqual(data1, 'data1', 'passed in data1 to command handler');
-      t.deepEqual(data2, 'data2', 'passed in data2 to command handler');
+      t.deepEqual(data[0], 'data1', 'passed in data1 to command handler');
+      t.deepEqual(data[1], 'data2', 'passed in data2 to command handler');
+      t.deepEqual(flags, {t: 'val'}, 'passed in flag map');
       t.ok(typeof done, 'function', 'passed in callback to command handler');
       done();
     });
   
-  // cmd.before(function (data, flags, done) {
+  cmd.before(function (data, flags, done) {
     
-  //   t.deepEqual(data, ['data1', 'data2'], 'passed in data to before');
-  //   t.ok(typeof done, 'function', 'passed in callback to before');
-  //   done();
-  // });
+    t.deepEqual(data, ['data1', 'data2'], 'passed in data to before');
+    t.ok(typeof done, 'function', 'passed in callback to before');
+    done();
+  });
   
-  // cmd.flag('-t')
-  //   .handler(function (val, done) {
+  cmd.flag('-t')
+    .handler(function (val, done) {
       
-  //     t.equal(val, 'val', 'passed val into flag handler');
-  //     t.ok(typeof done, 'function', 'passed in callback to flag handler');
-  //     done();
-  //   });
+      t.equal(val, 'val', 'passed val into flag handler');
+      t.ok(typeof done, 'function', 'passed in callback to flag handler');
+      done();
+    });
   
-  // cmd.after(function (data, flags, done) {
+  cmd.after(function (data, flags, done) {
     
-  //   t.deepEqual(data, ['data1', 'data2'], 'passed in data to after');
-  //   t.ok(typeof done, 'function', 'passed in callback to after');
-  //   done();
-  // });
+    t.deepEqual(data, ['data1', 'data2'], 'passed in data to after');
+    t.ok(typeof done, 'function', 'passed in callback to after');
+    done();
+  });
   
   cmd.run(['data1', 'data2'], {t: 'val'}, function (err) {
     

@@ -207,7 +207,7 @@ test('cli: runs command', function (t) {
       done();
     });
   cli.command('test')
-    .handler(function (done) {
+    .handler(function (data, flags, done) {
       
       callstack.push('command');
       handlerCalled = true;
@@ -229,10 +229,10 @@ test('cli: runs command', function (t) {
     handlerCalled = false;
     
     cli.command('test')
-      .handler(function (data, done) {
+      .handler(function (data, flags, done) {
         
         handlerCalled = true;
-        t.equal(data, 'data', 'passes data to handler');
+        t.equal(data[0], 'data', 'passes data to handler');
         done();
       });
     
@@ -327,9 +327,9 @@ test('cli: runs command task', function (t) {
   var taskRan = false;
   cli.command('test')
     .task('task')
-    .handler(function (data, done) {
+    .handler(function (data, flags, done) {
       
-      t.equal(data, 'data', 'passes data to task handler');
+      t.equal(data[0], 'data', 'passes data to task handler');
       taskRan = true;
       done();
     });
@@ -464,7 +464,7 @@ test('cli: default command', function (t) {
   var commandCalledCount = 0;
   
   cli.default()
-    .handler(function (done) {
+    .handler(function (data, flags, done) {
       
       commandCalledCount += 1;
       done();
@@ -490,10 +490,10 @@ test('cli: all arguments get passed to default command', function (t) {
   var cli = nash();
   
   cli.default()
-    .handler(function (arg1, arg2, done) {
+    .handler(function (data, flags, done) {
       
-      t.equal(arg1, 'arg1', 'argument 1 passed');
-      t.equal(arg2, 'arg2', 'argument 2 passed');
+      t.equal(data[0], 'arg1', 'argument 1 passed');
+      t.equal(data[1], 'arg2', 'argument 2 passed');
       done();
     });
   cli.run(['', '', 'arg1', 'arg2']);
@@ -515,7 +515,7 @@ test('cli: global flags work with default command', function (t) {
     });
   
   cli.default()
-    .handler(function (done) {
+    .handler(function (data, flags, done) {
       
       commandCalled = true;
       done();
@@ -589,7 +589,7 @@ test('cli: register an array of plugins', function (t) {
       });
       
       cli.command('test')
-        .handler(function (done) {
+        .handler(function (data, flags, done) {
           
           commandCalled = true;
           done();
@@ -636,7 +636,7 @@ test('cli: register a single plugin', function (t) {
       });
       
       cli.command('test')
-        .handler(function (done) {
+        .handler(function (data, flags, done) {
           
           commandCalled = true;
           done();
@@ -681,7 +681,7 @@ test('cli: registers plugin with no options', function (t) {
       });
       
       cli.command('test')
-        .handler(function (done) {
+        .handler(function (data, flags, done) {
           
           commandCalled = true;
           done();
@@ -720,7 +720,7 @@ test('cli: registers multiple plugins as an array', function (t) {
       });
       
       cli.command('test')
-        .handler(function (done) {
+        .handler(function (data, flags, done) {
           
           commandCalled = true;
           done();
@@ -734,7 +734,7 @@ test('cli: registers multiple plugins as an array', function (t) {
     register: function (cli, options, done) {
       
       cli.command('test2')
-        .handler(function (done) {
+        .handler(function (data, flags, done) {
           
           command2Called = true;
           done();
