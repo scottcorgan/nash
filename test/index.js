@@ -477,7 +477,22 @@ test('cli: default command', function (t) {
   });
 });
 
-test('cli: all arguments get passed to default command', function (t) {
+test('cli: one argument gets passed to default command', function (t) {
+  
+  t.plan(1);
+  
+  var cli = nash();
+  
+  cli.default()
+    .handler(function (data, flags, done) {
+      
+      t.equal(data[0], 'arg1', 'argument 1 passed');
+      done();
+    });
+  cli.run(['', '', 'arg1']);
+});
+
+test('cli: two arguments get passed to default command', function (t) {
   
   t.plan(2);
   
