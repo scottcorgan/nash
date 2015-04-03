@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "jshint": "^2.5.10",
-    "tap-spec": "^2.1.1",
+    "tap-spec": "^3.0.0",
     "tape": "^3.4.0"
   }
 }
