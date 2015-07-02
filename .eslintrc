@@ -1,0 +1,25 @@
+{
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "brace-style": [2, "stroustrup", {"allowSingleLine": false}],
+    "camelcase": [2, {"properties": "never"}],
+    "comma-style": [2, "last"],
+    "consistent-this": [2, "self"],
+    "indent": [2, 2],
+    "no-console": 1,
+    "no-use-before-define": 0,
+    "consistent-return": 0,
+    "new-cap": 0,
+    "no-alert": 0,
+    "no-underscore-dangle": 0,
+    "quotes": [2, "single", "avoid-escape"],
+    "semi": [2, "always"],
+    "space-before-blocks": [2, "always"],
+    "space-before-function-paren": [2, "always"],
+    "space-in-brackets": [2, "never"],
+    "space-in-parens": [2, "never"],
+    "strict": 0
+  }
+}

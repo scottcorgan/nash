@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "npm run lint && tape test/** | tap-spec",
-    "lint": "jshint ./lib/** ./test/**"
+    "jshint": "jshint ./lib/** ./test/**",
+    "lint": "eslint lib/"
   },
   "repository": {
     "type": "git",
@@ -33,7 +34,7 @@
     "minimist": "^1.1.0"
   },
   "devDependencies": {
-    "jshint": "^2.8.0",
+    "eslint": "^0.24.0",
     "tap-spec": "^4.0.0",
     "tape": "^4.0.0"
   }
