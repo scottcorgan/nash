@@ -1,6 +1,6 @@
 {
   "name": "nash",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "description": "Craft command-line Masterpieces",
   "main": "lib/index.js",
   "scripts": {
