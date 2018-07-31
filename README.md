@@ -1,4 +1,4 @@
-# nash [![NPM Module](http://img.shields.io/npm/v/nash.svg?style=flat-square)](https://npmjs.org/package/nash) [![Downloads a Month](https://img.shields.io/npm/dm/nash.svg?style=flat-square)](https://npmjs.org/package/nash) [ ![Travis Status for scottcorgan/nash](https://img.shields.io/travis/scottcorgan/nash.svg?style=flat-square)](https://travis-ci.org/scottcorgan/nash)
+# nash 
 
 Craft command-line masterpieces
 
