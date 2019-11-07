@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@tap-format/spec": "0.2.0",
-    "eslint": "^0.24.0",
+    "eslint": "^4.18.2",
     "tape": "^4.0.0"
   }
 }
